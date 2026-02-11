@@ -1,0 +1,342 @@
+// HC_Panel Main Menu - Unified Character Panel
+// Sidebar layout with module navigation
+
+// Colors
+@BgDark = #0a1119(0.95);
+@BgLight = #141c26(0.98);
+@BgCard = #1b2532(0.5);
+@TextPrimary = #ffffff;
+@TextSecondary = #96a9be;
+@TextGold = #d4af37;
+@Border = #2b3542;
+@BadgeBg = #e74c3c;
+
+// Menu Button Style
+@MenuButtonStyle = TextButtonStyle(
+  Default: (Background: #000000(0), LabelStyle: (FontSize: 14, TextColor: #96a9be, RenderBold: true, VerticalAlignment: Center)),
+  Hovered: (Background: #1b2532, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center)),
+  Pressed: (Background: #0e151e, LabelStyle: (FontSize: 14, TextColor: #96a9be, RenderBold: true, VerticalAlignment: Center)),
+);
+
+// Primary Button (BACK)
+@PrimaryButtonStyle = TextButtonStyle(
+  Default: (Background: #3a7bd5, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #4a8be5, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #2a6bc5, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+);
+
+// Danger Button (CLOSE)
+@DangerButtonStyle = TextButtonStyle(
+  Default: (Background: #8b3a3a, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #9b4a4a, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #7b2a2a, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+);
+
+// Page overlay background
+Group {
+  Background: #000000(0.5);
+
+  Group {
+    Anchor: (Width: 800, Height: 520);
+    LayoutMode: Left;
+
+    // ===== LEFT PANEL (Sidebar) =====
+    Group #LeftPanel {
+      Anchor: (Width: 180);
+      Background: @BgDark;
+      LayoutMode: Top;
+      Padding: (Full: 16);
+
+      // Header
+      Label #SidebarHeader {
+        Text: "MENU";
+        Anchor: (Height: 28);
+        Style: (FontSize: 12, TextColor: @TextGold, RenderBold: true, LetterSpacing: 3);
+      }
+
+      Group { Anchor: (Height: 16); }
+
+      // Module buttons (5 slots max)
+      Group #ModuleRow0 {
+        Anchor: (Height: 38);
+        LayoutMode: Left;
+
+        TextButton #ModuleButton0 {
+          Text: "Factions";
+          FlexWeight: 1;
+          Style: @MenuButtonStyle;
+        }
+
+        Group #ModuleBadge0 {
+          Anchor: (Width: 24, Height: 24);
+          Background: @BadgeBg;
+          Visible: false;
+
+          Label #ModuleBadge0Text {
+            Text: "0";
+            Style: (FontSize: 11, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+          }
+        }
+      }
+
+      Group #ModuleRow1 {
+        Anchor: (Height: 38);
+        LayoutMode: Left;
+
+        TextButton #ModuleButton1 {
+          Text: "Honor";
+          FlexWeight: 1;
+          Style: @MenuButtonStyle;
+        }
+
+        Group #ModuleBadge1 {
+          Anchor: (Width: 24, Height: 24);
+          Background: @BadgeBg;
+          Visible: false;
+
+          Label #ModuleBadge1Text {
+            Text: "0";
+            Style: (FontSize: 11, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+          }
+        }
+      }
+
+      Group #ModuleRow2 {
+        Anchor: (Height: 38);
+        LayoutMode: Left;
+
+        TextButton #ModuleButton2 {
+          Text: "Attributes";
+          FlexWeight: 1;
+          Style: @MenuButtonStyle;
+        }
+
+        Group #ModuleBadge2 {
+          Anchor: (Width: 24, Height: 24);
+          Background: @BadgeBg;
+          Visible: false;
+
+          Label #ModuleBadge2Text {
+            Text: "0";
+            Style: (FontSize: 11, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+          }
+        }
+      }
+
+      Group #ModuleRow3 {
+        Anchor: (Height: 38);
+        LayoutMode: Left;
+        Visible: false;
+
+        TextButton #ModuleButton3 {
+          Text: "Module 4";
+          FlexWeight: 1;
+          Style: @MenuButtonStyle;
+        }
+
+        Group #ModuleBadge3 {
+          Anchor: (Width: 24, Height: 24);
+          Background: @BadgeBg;
+          Visible: false;
+
+          Label #ModuleBadge3Text {
+            Text: "0";
+            Style: (FontSize: 11, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+          }
+        }
+      }
+
+      Group #ModuleRow4 {
+        Anchor: (Height: 38);
+        LayoutMode: Left;
+        Visible: false;
+
+        TextButton #ModuleButton4 {
+          Text: "Module 5";
+          FlexWeight: 1;
+          Style: @MenuButtonStyle;
+        }
+
+        Group #ModuleBadge4 {
+          Anchor: (Width: 24, Height: 24);
+          Background: @BadgeBg;
+          Visible: false;
+
+          Label #ModuleBadge4Text {
+            Text: "0";
+            Style: (FontSize: 11, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+          }
+        }
+      }
+
+      // Spacer
+      Group { FlexWeight: 1; }
+
+      // BACK button (hidden in main menu)
+      TextButton #BackButton {
+        Text: "BACK";
+        Anchor: (Height: 38);
+        Style: @PrimaryButtonStyle;
+        Visible: false;
+      }
+
+      // CLOSE button
+      TextButton #CloseButton {
+        Text: "CLOSE";
+        Anchor: (Height: 38);
+        Style: @DangerButtonStyle;
+      }
+    }
+
+    // ===== RIGHT PANEL (Content) =====
+    Group #RightPanel {
+      FlexWeight: 1;
+      Background: @BgLight;
+      LayoutMode: Top;
+      Padding: (Full: 20);
+
+      // Header Section
+      Group #HeaderSection {
+        Anchor: (Height: 60);
+        LayoutMode: Top;
+
+        Label #HeaderTitle {
+          Text: "CHARACTER PANEL";
+          Anchor: (Height: 32);
+          Style: (FontSize: 22, TextColor: @TextGold, RenderBold: true, LetterSpacing: 2);
+        }
+
+        Label #HeaderSubtitle {
+          Text: "Welcome, Player";
+          Anchor: (Height: 20);
+          Style: (FontSize: 14, TextColor: @TextSecondary);
+        }
+      }
+
+      Group { Anchor: (Height: 1); Background: @Border; }
+      Group { Anchor: (Height: 16); }
+
+      // Welcome Content (shown in main menu)
+      Group #WelcomeContent {
+        FlexWeight: 1;
+        LayoutMode: Top;
+        Background: @BgCard;
+        Padding: (Full: 20);
+
+        Label {
+          Text: "WELCOME";
+          Anchor: (Height: 24);
+          Style: (FontSize: 11, TextColor: @TextSecondary, RenderBold: true, LetterSpacing: 2);
+        }
+
+        Group { Anchor: (Height: 12); }
+
+        Label #WelcomeText {
+          Text: "Use the sidebar to navigate between modules.";
+          Style: (FontSize: 14, TextColor: @TextPrimary, Wrap: true);
+        }
+
+        Group { FlexWeight: 1; }
+
+        // Quick stats row (optional future enhancement)
+        Group #QuickStatsRow {
+          Anchor: (Height: 80);
+          LayoutMode: Left;
+          Visible: false;
+
+          Group {
+            FlexWeight: 1;
+            LayoutMode: Top;
+            Background: #0a1119(0.5);
+            Padding: (Full: 10);
+
+            Label {
+              Text: "LEVEL";
+              Anchor: (Height: 14);
+              Style: (FontSize: 9, TextColor: @TextSecondary, RenderBold: true, LetterSpacing: 1);
+            }
+
+            Label #QuickLevel {
+              Text: "1";
+              Anchor: (Height: 28);
+              Style: (FontSize: 22, TextColor: #4FC3F7, RenderBold: true);
+            }
+          }
+
+          Group { Anchor: (Width: 8); }
+
+          Group {
+            FlexWeight: 1;
+            LayoutMode: Top;
+            Background: #0a1119(0.5);
+            Padding: (Full: 10);
+
+            Label {
+              Text: "HONOR RANK";
+              Anchor: (Height: 14);
+              Style: (FontSize: 9, TextColor: @TextSecondary, RenderBold: true, LetterSpacing: 1);
+            }
+
+            Label #QuickHonorRank {
+              Text: "Unranked";
+              Anchor: (Height: 28);
+              Style: (FontSize: 16, TextColor: @TextGold, RenderBold: true);
+            }
+          }
+
+          Group { Anchor: (Width: 8); }
+
+          Group {
+            FlexWeight: 1;
+            LayoutMode: Top;
+            Background: #0a1119(0.5);
+            Padding: (Full: 10);
+
+            Label {
+              Text: "GUILD";
+              Anchor: (Height: 14);
+              Style: (FontSize: 9, TextColor: @TextSecondary, RenderBold: true, LetterSpacing: 1);
+            }
+
+            Label #QuickGuild {
+              Text: "None";
+              Anchor: (Height: 28);
+              Style: (FontSize: 16, TextColor: #81C784, RenderBold: true);
+            }
+          }
+        }
+      }
+
+      // Module Content placeholder (shown in module view)
+      Group #ModuleContent {
+        FlexWeight: 1;
+        LayoutMode: Top;
+        Background: @BgCard;
+        Padding: (Full: 20);
+        Visible: false;
+
+        Label {
+          Text: "MODULE VIEW";
+          Anchor: (Height: 24);
+          Style: (FontSize: 11, TextColor: @TextSecondary, RenderBold: true, LetterSpacing: 2);
+        }
+
+        Group { Anchor: (Height: 12); }
+
+        Label #ModuleContentText {
+          Text: "Select an option from the sidebar.";
+          Style: (FontSize: 14, TextColor: @TextPrimary, Wrap: true);
+        }
+      }
+
+      // Footer
+      Group { FlexWeight: 1; }
+
+      Label {
+        Text: "Press ESC or click CLOSE to exit";
+        Anchor: (Height: 16);
+        Style: (FontSize: 10, TextColor: #555555, HorizontalAlignment: Center);
+      }
+    }
+  }
+}
