@@ -3,11 +3,9 @@ package com.hcpanel.gui;
 import com.hcpanel.HC_PanelPlugin;
 import com.hcpanel.gui.content.*;
 
-// Direct imports from optional dependencies
+// HC_Factions is a required dependency
 import com.hcfactions.HC_FactionsPlugin;
-import com.hchonor.HC_HonorPlugin;
-import com.hcattributes.HC_AttributesPlugin;
-import com.hcclasses.HC_ClassesPlugin;
+// All other plugin deps are optional - detected at runtime via reflection
 
 import com.hypixel.hytale.codec.Codec;
 import com.hypixel.hytale.codec.KeyedCodec;
@@ -48,20 +46,26 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
     private final String currentPath;
     private final String previousPath;
 
-    // Content renderers
+    // Content renderers (always available)
     private final NewsContentRenderer newsRenderer;
     private final GuideContentRenderer guideRenderer;
-    private final HonorContentRenderer honorRenderer;
-    private final AttributesContentRenderer attributesRenderer;
     private final FactionsContentRenderer factionsRenderer;
-    private final ClassesContentRenderer classesRenderer;
-    private final CharacterContentRenderer characterRenderer;
-    private final SettingsContentRenderer settingsRenderer;
+    // Content renderers (lazy - only created if their plugin is loaded)
+    private HonorContentRenderer honorRenderer;
+    private AttributesContentRenderer attributesRenderer;
+    private ClassesContentRenderer classesRenderer;
+    private CharacterContentRenderer characterRenderer;
+    private SettingsContentRenderer settingsRenderer;
+    private SkillsContentRenderer skillsRenderer;
 
     // Pending input values
     private String pendingGuildName;
     private String pendingGuildTag;
     private String pendingInvitePlayer;
+    private String pendingBrowserSearch;
+
+    // State passed between page instances
+    private String browserSearch;
 
     /**
      * Create panel at root level (main menu)
@@ -80,15 +84,21 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
         this.currentPath = currentPath;
         this.previousPath = previousPath;
 
-        // Initialize content renderers
+        // Initialize always-available renderers
         this.newsRenderer = new NewsContentRenderer(playerRef, plugin.getNewsConfig());
         this.guideRenderer = new GuideContentRenderer(playerRef);
-        this.honorRenderer = new HonorContentRenderer(playerRef);
-        this.attributesRenderer = new AttributesContentRenderer(playerRef);
         this.factionsRenderer = new FactionsContentRenderer(playerRef);
-        this.classesRenderer = new ClassesContentRenderer(playerRef);
-        this.characterRenderer = new CharacterContentRenderer(playerRef);
+        // Initialize optional renderers only if their plugin is loaded
+        if (isModuleAvailable("honor")) this.honorRenderer = new HonorContentRenderer(playerRef);
+        if (isModuleAvailable("attributes")) this.attributesRenderer = new AttributesContentRenderer(playerRef);
+        if (isModuleAvailable("classes")) this.classesRenderer = new ClassesContentRenderer(playerRef);
+        if (isModuleAvailable("character")) this.characterRenderer = new CharacterContentRenderer(playerRef);
         this.settingsRenderer = new SettingsContentRenderer(playerRef);
+        if (isModuleAvailable("skills")) this.skillsRenderer = new SkillsContentRenderer(playerRef);
+    }
+
+    public void setBrowserSearch(String search) {
+        this.browserSearch = search;
     }
 
     @Override
@@ -134,8 +144,11 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
             buttons.add(new SidebarButton("Honor", "nav:honor:standing", null, "#d4af37"));
         }
         if (isModuleAvailable("character")) {
-            String badge = characterRenderer.getCombinedPointsBadge();
+            String badge = characterRenderer != null ? characterRenderer.getCombinedPointsBadge() : null;
             buttons.add(new SidebarButton("Character", "nav:character:overview", badge, "#d4af37"));
+        }
+        if (isModuleAvailable("skills")) {
+            buttons.add(new SidebarButton("Skills", "nav:skills:professions", null, "#4ecdc4"));
         }
 
         // Always-available settings
@@ -167,6 +180,7 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
             case "attributes" -> "#8b5cf6";
             case "classes" -> "#8b4513";
             case "character" -> "#d4af37";
+            case "skills" -> "#4ecdc4";
             case "settings" -> "#6c7a89";
             default -> "#ffffff";
         };
@@ -179,6 +193,7 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
             case "attributes" -> "ATTRIBUTES";
             case "classes" -> "CLASSES";
             case "character" -> "CHARACTER";
+            case "skills" -> "SKILLS";
             case "settings" -> "SETTINGS";
             default -> "PANEL";
         };
@@ -196,6 +211,7 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
             case "factions" -> factionsRenderer.getSidebarButtons(view);
             case "classes" -> classesRenderer.getSidebarButtons(view);
             case "character" -> characterRenderer.getSidebarButtons(view);
+            case "skills" -> skillsRenderer.getSidebarButtons(view);
             case "settings" -> settingsRenderer.getSidebarButtons(view);
             default -> new ArrayList<>();
         };
@@ -214,9 +230,16 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
             case "guide" -> guideRenderer.renderContent(cmd, events, view);
             case "honor" -> honorRenderer.renderContent(cmd, events, view, subView);
             case "attributes" -> attributesRenderer.renderContent(cmd, events, store, playerRef, view);
-            case "factions" -> factionsRenderer.renderContent(cmd, events, store, playerRef, view);
+            case "factions" -> {
+                cmd.set("#HeaderSection.Visible", false);
+                cmd.set("#HeaderBorder.Visible", false);
+                cmd.set("#HeaderSpacer.Visible", false);
+                if (browserSearch != null) factionsRenderer.setBrowserSearch(browserSearch);
+                factionsRenderer.renderContent(cmd, events, store, playerRef, view, subView);
+            }
             case "classes" -> classesRenderer.renderContent(cmd, events, store, playerRef, view);
             case "character" -> characterRenderer.renderContent(cmd, events, store, playerRef, view);
+            case "skills" -> skillsRenderer.renderContent(cmd, events, view);
             case "settings" -> settingsRenderer.renderContent(cmd, events, view);
         }
     }
@@ -303,6 +326,9 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
         if (data.invitePlayerInput != null) {
             this.pendingInvitePlayer = data.invitePlayerInput;
         }
+        if (data.browserSearchInput != null) {
+            this.pendingBrowserSearch = data.browserSearchInput;
+        }
 
         if (data.action == null) return;
 
@@ -364,6 +390,7 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
                  "leave_guild", "create_guild", "promote", "demote", "kick",
                  "set_tag", "clear_tag", "invite_player" ->
                 handleGuildAction(ref, store, player, actionType + ":" + actionParam);
+            case "browser_search" -> handleBrowserSearch(ref, store, player);
             case "talent" -> handleTalentAction(ref, store, player, actionParam);
             case "setting" -> handleSettingToggle(ref, store, player, actionParam);
         }
@@ -395,6 +422,12 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
             new UnifiedPanelGui(plugin, playerRef, currentPath, previousPath));
     }
 
+    private void handleBrowserSearch(Ref<EntityStore> ref, Store<EntityStore> store, Player player) {
+        UnifiedPanelGui newPage = new UnifiedPanelGui(plugin, playerRef, currentPath, previousPath);
+        newPage.setBrowserSearch(pendingBrowserSearch);
+        player.getPageManager().openCustomPage(ref, store, newPage);
+    }
+
     private void handleTalentAction(Ref<EntityStore> ref, Store<EntityStore> store, Player player, String actionData) {
         String[] parts = actionData.split(":");
         if (parts.length < 2) return;
@@ -417,9 +450,11 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
             }
         }
 
-        // Refresh the page
-        player.getPageManager().openCustomPage(ref, store,
-            new UnifiedPanelGui(plugin, playerRef, currentPath, previousPath));
+        // Re-render talent tree in-place (preserves scroll position)
+        UICommandBuilder cmd = new UICommandBuilder();
+        UIEventBuilder events = new UIEventBuilder();
+        classesRenderer.renderContent(cmd, events, store, playerRef, "talents");
+        sendUpdate(cmd, events, false);
     }
 
     private void handleSettingToggle(Ref<EntityStore> ref, Store<EntityStore> store, Player player, String setting) {
@@ -432,12 +467,23 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
     private boolean isModuleAvailable(String module) {
         return switch (module) {
             case "factions" -> HC_FactionsPlugin.getInstance() != null;
-            case "honor" -> HC_HonorPlugin.getInstance() != null;
-            case "attributes" -> HC_AttributesPlugin.getInstance() != null;
-            case "classes" -> HC_ClassesPlugin.getInstance() != null;
-            case "character" -> HC_AttributesPlugin.getInstance() != null || HC_ClassesPlugin.getInstance() != null;
+            case "honor" -> isPluginLoaded("com.hchonor.HC_HonorPlugin");
+            case "attributes" -> isPluginLoaded("com.hcattributes.HC_AttributesPlugin");
+            case "classes" -> isPluginLoaded("com.hcclasses.HC_ClassesPlugin");
+            case "character" -> isPluginLoaded("com.hcattributes.HC_AttributesPlugin") || isPluginLoaded("com.hcclasses.HC_ClassesPlugin");
+            case "skills" -> isPluginLoaded("com.hcprofessions.HC_ProfessionsPlugin");
             default -> false;
         };
+    }
+
+    private static boolean isPluginLoaded(String className) {
+        try {
+            Class<?> clazz = Class.forName(className);
+            Object instance = clazz.getMethod("getInstance").invoke(null);
+            return instance != null;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private String getPlayerSubtitle() {
@@ -475,11 +521,14 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
                 (d, s) -> d.guildTagInput = s, d -> d.guildTagInput)
             .addField(new KeyedCodec<>("@InvitePlayerInput", Codec.STRING),
                 (d, s) -> d.invitePlayerInput = s, d -> d.invitePlayerInput)
+            .addField(new KeyedCodec<>("@BrowserSearchInput", Codec.STRING),
+                (d, s) -> d.browserSearchInput = s, d -> d.browserSearchInput)
             .build();
 
         private String action;
         private String guildNameInput;
         private String guildTagInput;
         private String invitePlayerInput;
+        private String browserSearchInput;
     }
 }

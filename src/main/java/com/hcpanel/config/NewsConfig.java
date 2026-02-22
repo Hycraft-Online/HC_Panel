@@ -58,6 +58,15 @@ public class NewsConfig {
         return entries;
     }
 
+    public NewsConfig() {}
+
+    /**
+     * Constructor accepting pre-built entries (from database).
+     */
+    public NewsConfig(List<NewsEntry> entries) {
+        this.entries = entries != null ? entries : new ArrayList<>();
+    }
+
     /**
      * A single news entry.
      */
@@ -65,7 +74,23 @@ public class NewsConfig {
         private String title;
         private String date;
         private String type;
+        private String label;
         private String content;
+
+        public NewsEntry() {}
+
+        /**
+         * Factory for database-loaded entries with explicit label.
+         */
+        public static NewsEntry of(String title, String date, String type, String label, String content) {
+            NewsEntry e = new NewsEntry();
+            e.title = title;
+            e.date = date;
+            e.type = type;
+            e.label = label;
+            e.content = content;
+            return e;
+        }
 
         public String getTitle() {
             return title != null ? title : "Untitled";
@@ -100,6 +125,7 @@ public class NewsConfig {
          * Get display label for the type badge.
          */
         public String getTypeLabel() {
+            if (label != null && !label.isEmpty()) return label;
             return getType().toUpperCase();
         }
     }

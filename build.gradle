@@ -23,6 +23,10 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
+    shadowBundle 'org.postgresql:postgresql:42.7.8'
+    shadowBundle 'com.zaxxer:HikariCP:7.0.2'
+    shadowBundle 'org.slf4j:slf4j-simple:2.0.17'
+
     // Path to HytaleServer.jar
     def localServerJar = file("${rootProject.projectDir}/../../server-files/Server/HytaleServer.jar")
     def serverJarPath = localServerJar.exists()
@@ -55,6 +59,11 @@ dependencies {
     def hcLevelingJar = file("${rootProject.projectDir}/../HC_Leveling/build/libs/HC_Leveling-1.0.0.jar")
     if (hcLevelingJar.exists()) {
         compileOnly(files(hcLevelingJar))
+    }
+
+    def hcProfessionsJar = file("${rootProject.projectDir}/../HC_Professions/build/libs/HC_Professions-1.0.0.jar")
+    if (hcProfessionsJar.exists()) {
+        compileOnly(files(hcProfessionsJar))
     }
 }
 

@@ -30,8 +30,16 @@ public class CharacterContentRenderer {
 
     public CharacterContentRenderer(PlayerRef playerRef) {
         this.playerRef = playerRef;
-        this.attributesRenderer = new AttributesContentRenderer(playerRef);
-        this.classesRenderer = new ClassesContentRenderer(playerRef);
+        // These are optional - only created if their plugin is loaded
+        AttributesContentRenderer attrTemp = null;
+        try { attrTemp = new AttributesContentRenderer(playerRef); } catch (NoClassDefFoundError ignored) {}
+        this.attributesRenderer = attrTemp;
+        // ClassesContentRenderer has direct imports to HC_Classes - skip if not loaded
+        ClassesContentRenderer classTemp = null;
+        if (isClassesAvailable()) {
+            try { classTemp = new ClassesContentRenderer(playerRef); } catch (NoClassDefFoundError ignored) {}
+        }
+        this.classesRenderer = classTemp;
     }
 
     /**
@@ -44,8 +52,8 @@ public class CharacterContentRenderer {
         boolean isTalents = "talents".equals(currentView);
         boolean isAllocate = "allocate".equals(currentView);
 
-        String statBadge = attributesRenderer.getStatPointsBadge();
-        String talentBadge = classesRenderer.getTalentPointsBadge();
+        String statBadge = attributesRenderer != null ? attributesRenderer.getStatPointsBadge() : null;
+        String talentBadge = classesRenderer != null ? classesRenderer.getTalentPointsBadge() : null;
 
         buttons.add(new SidebarButton("Overview", "nav:character:overview", null, HEADER_COLOR, isOverview));
         buttons.add(new SidebarButton("Talents", "nav:character:talents", talentBadge, HEADER_COLOR, isTalents));
@@ -60,14 +68,14 @@ public class CharacterContentRenderer {
     public String getCombinedPointsBadge() {
         int total = 0;
 
-        String statBadge = attributesRenderer.getStatPointsBadge();
-        if (statBadge != null) {
-            total += Integer.parseInt(statBadge);
+        if (attributesRenderer != null) {
+            String statBadge = attributesRenderer.getStatPointsBadge();
+            if (statBadge != null) total += Integer.parseInt(statBadge);
         }
 
-        String talentBadge = classesRenderer.getTalentPointsBadge();
-        if (talentBadge != null) {
-            total += Integer.parseInt(talentBadge);
+        if (classesRenderer != null) {
+            String talentBadge = classesRenderer.getTalentPointsBadge();
+            if (talentBadge != null) total += Integer.parseInt(talentBadge);
         }
 
         return total > 0 ? String.valueOf(total) : null;
@@ -83,20 +91,20 @@ public class CharacterContentRenderer {
 
         switch (view) {
             case "overview" -> {
-                // Delegate to attributes renderer with "stats" view
-                attributesRenderer.renderContent(cmd, events, store, playerRef, "stats");
+                if (attributesRenderer != null) attributesRenderer.renderContent(cmd, events, store, playerRef, "stats");
+                else showUnavailable(cmd, "Attributes");
             }
             case "talents" -> {
-                // Delegate to classes renderer
-                classesRenderer.renderContent(cmd, events, store, playerRef, "talents");
+                if (classesRenderer != null) classesRenderer.renderContent(cmd, events, store, playerRef, "talents");
+                else showUnavailable(cmd, "Classes");
             }
             case "allocate" -> {
-                // Delegate to attributes renderer with "allocate" view
-                attributesRenderer.renderContent(cmd, events, store, playerRef, "allocate");
+                if (attributesRenderer != null) attributesRenderer.renderContent(cmd, events, store, playerRef, "allocate");
+                else showUnavailable(cmd, "Attributes");
             }
             default -> {
-                // Unknown view - show overview
-                attributesRenderer.renderContent(cmd, events, store, playerRef, "stats");
+                if (attributesRenderer != null) attributesRenderer.renderContent(cmd, events, store, playerRef, "stats");
+                else showUnavailable(cmd, "Attributes");
             }
         }
     }
@@ -105,22 +113,28 @@ public class CharacterContentRenderer {
      * Handles stat point allocation (delegates to attributes renderer).
      */
     public boolean handleAllocation(PlayerRef playerRef, String actionData) {
-        return attributesRenderer.handleAllocation(playerRef, actionData);
+        return attributesRenderer != null && attributesRenderer.handleAllocation(playerRef, actionData);
     }
 
-    /**
-     * Handles talent allocation (delegates to classes renderer).
-     * @return error message on failure, null on success
-     */
     public String handleTalentAllocation(PlayerRef playerRef, String talentId) {
-        return classesRenderer.handleTalentAllocation(playerRef, talentId);
+        return classesRenderer != null ? classesRenderer.handleTalentAllocation(playerRef, talentId) : "Classes not available";
     }
 
-    /**
-     * Handles talent reset (delegates to classes renderer).
-     * @return number of points refunded
-     */
     public int handleTalentReset(PlayerRef playerRef) {
-        return classesRenderer.handleTalentReset(playerRef);
+        return classesRenderer != null ? classesRenderer.handleTalentReset(playerRef) : 0;
+    }
+
+    private void showUnavailable(UICommandBuilder cmd, String module) {
+        cmd.set("#ContentText.Visible", true);
+        cmd.set("#ContentText.Text", module + " module not available.");
+    }
+
+    private static boolean isClassesAvailable() {
+        try {
+            Class.forName("com.hcclasses.api.HC_ClassesAPI");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 }

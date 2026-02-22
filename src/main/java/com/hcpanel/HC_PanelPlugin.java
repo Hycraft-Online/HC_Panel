@@ -2,15 +2,20 @@ package com.hcpanel;
 
 import com.hcpanel.commands.MenuCommand;
 import com.hcpanel.config.NewsConfig;
+import com.hcpanel.database.DatabaseConfig;
+import com.hcpanel.database.DatabaseManager;
+import com.hcpanel.database.NewsRepository;
 import com.hcpanel.gui.modules.CharacterModule;
 import com.hcpanel.gui.modules.FactionsModule;
 import com.hcpanel.gui.modules.HonorModule;
 import com.hcpanel.gui.modules.ModuleContentProvider;
+import com.hcpanel.gui.modules.SkillsModule;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -27,6 +32,7 @@ public class HC_PanelPlugin extends JavaPlugin {
 
     private final List<ModuleContentProvider> availableModules = new ArrayList<>();
     private NewsConfig newsConfig;
+    private DatabaseManager databaseManager;
 
     public HC_PanelPlugin(@NonNullDecl JavaPluginInit init) {
         super(init);
@@ -38,8 +44,8 @@ public class HC_PanelPlugin extends JavaPlugin {
         super.setup();
         this.getLogger().at(Level.INFO).log("HC_Panel setting up...");
 
-        // Load news configuration
-        this.newsConfig = NewsConfig.load(this.getLogger());
+        // Load news from database, fall back to bundled JSON
+        this.newsConfig = loadNewsFromDatabase();
 
         // Detect available modules
         detectAvailableModules();
@@ -60,8 +66,37 @@ public class HC_PanelPlugin extends JavaPlugin {
     @Override
     protected void shutdown() {
         super.shutdown();
+        if (databaseManager != null) {
+            databaseManager.close();
+        }
         this.getLogger().at(Level.INFO).log("HC_Panel shutting down...");
         instance = null;
+    }
+
+    /**
+     * Tries to load news from the database, falls back to bundled news.json.
+     */
+    private NewsConfig loadNewsFromDatabase() {
+        try {
+            File modFolder = new File("mods/.hc_config/HC_Panel");
+            DatabaseConfig dbConfig = DatabaseConfig.load(modFolder);
+            databaseManager = new DatabaseManager(
+                    dbConfig.getUrl(), dbConfig.getUsername(),
+                    dbConfig.getPassword(), dbConfig.getPoolSize());
+
+            NewsRepository newsRepo = new NewsRepository(databaseManager);
+            List<NewsConfig.NewsEntry> entries = newsRepo.loadPublishedNews(10);
+
+            if (!entries.isEmpty()) {
+                this.getLogger().at(Level.INFO).log("Loaded " + entries.size() + " news articles from database");
+                return new NewsConfig(entries);
+            }
+
+            this.getLogger().at(Level.WARNING).log("No news found in database, falling back to news.json");
+        } catch (Exception e) {
+            this.getLogger().at(Level.WARNING).log("Database unavailable for news, falling back to news.json: " + e.getMessage());
+        }
+        return NewsConfig.load(this.getLogger());
     }
 
     /**
@@ -89,6 +124,12 @@ public class HC_PanelPlugin extends JavaPlugin {
         if (hasAttributes || hasClasses) {
             availableModules.add(new CharacterModule());
             this.getLogger().at(Level.INFO).log("Detected HC_Attributes/HC_Classes - Character module enabled");
+        }
+
+        // Check for HC_Professions - Skills module
+        if (isPluginAvailable("com.hcprofessions.HC_ProfessionsPlugin")) {
+            availableModules.add(new SkillsModule());
+            this.getLogger().at(Level.INFO).log("Detected HC_Professions - Skills module enabled");
         }
 
         if (availableModules.isEmpty()) {

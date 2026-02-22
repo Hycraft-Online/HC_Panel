@@ -63,8 +63,8 @@ public class NewsContentRenderer {
         }
         cmd.set("#HeaderInfo.Text", infoText);
 
-        // Render up to 5 news entries
-        for (int i = 0; i < 5; i++) {
+        // Render up to 10 news entries
+        for (int i = 0; i < 10; i++) {
             String cardId = "#NewsCard" + i;
 
             if (i < entries.size()) {

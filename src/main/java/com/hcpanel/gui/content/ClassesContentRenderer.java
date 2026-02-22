@@ -15,6 +15,13 @@ import com.hcclasses.models.PlayerClass;
 import com.hcclasses.talents.Talent;
 import com.hcclasses.talents.TalentTree;
 
+// Direct imports from HC_Factions (optional dependency)
+import com.hcfactions.HC_FactionsPlugin;
+import com.hcfactions.models.PlayerData;
+
+import com.hypixel.hytale.server.core.Message;
+
+import java.awt.Color;
 import java.util.*;
 
 /**
@@ -91,6 +98,9 @@ public class ClassesContentRenderer {
         }
     }
 
+    // Maximum number of tiers supported by the UI layout
+    private static final int MAX_UI_TIERS = 9;
+
     private void renderTalentTree(UICommandBuilder cmd, UIEventBuilder events) {
         // Get player's talent tree and allocations
         TalentTree tree = HC_ClassesAPI.getPlayerTalentTree(playerRef.getUuid());
@@ -102,23 +112,42 @@ public class ClassesContentRenderer {
 
         Map<String, Integer> allocations = HC_ClassesAPI.getPlayerTalentAllocations(playerRef.getUuid());
         int availablePoints = HC_ClassesAPI.getAvailableTalentPoints(playerRef.getUuid());
-        int playerLevel = HC_ClassesAPI.getClassLevel(playerRef.getUuid());
+        int classLevel = HC_ClassesAPI.getClassLevel(playerRef.getUuid());
+        int displayLevel = getPlayerLevel();
         PlayerClass playerClass = HC_ClassesAPI.getPlayerClass(playerRef.getUuid());
 
-        // === HEADER SECTION ===
-        String classDisplay = playerClass != null ? playerClass.getDisplayName().toUpperCase() : "UNKNOWN";
-        cmd.set("#HeaderSubtitle.Text", classDisplay + " TALENTS");
-        cmd.set("#HeaderSubtitle.Style.TextColor", HEADER_COLOR);
-        cmd.set("#HeaderInfo.Text", tree.getName() + " - Level " + playerLevel);
+        // === HEADER SECTION (matches overview/allocate hero header) ===
+        cmd.set("#HeaderSection.Visible", false);
+        cmd.set("#AttrHeroSection.Visible", true);
 
-        // Available points badge
+        cmd.set("#AttrLevelNumber.Text", String.valueOf(displayLevel));
+
+        String classDisplay = playerClass != null ? playerClass.getDisplayName() : "Adventurer";
+        cmd.set("#AttrClassName.Text", classDisplay.toUpperCase());
+        cmd.set("#AttrPlayerName.Text", playerRef.getUsername());
+
+        // Faction tag
+        String factionId = getFactionId();
+        if (factionId != null) {
+            var factionsPlugin = HC_FactionsPlugin.getInstance();
+            if (factionsPlugin != null) {
+                var faction = factionsPlugin.getFactionManager().getFaction(factionId);
+                if (faction != null) {
+                    cmd.set("#AttrFactionTag.TextSpans",
+                        Message.raw("[" + faction.getShortName() + "]").color(Color.decode(faction.getColorHex())));
+                }
+            }
+        }
+
+        // Available points banner
         if (availablePoints > 0) {
-            cmd.set("#HeaderBadge.Visible", true);
-            cmd.set("#HeaderBadgeText.Text", availablePoints + " Points");
+            cmd.set("#AttrPointsBanner.Visible", true);
+            cmd.set("#AttrPointsValue.Text", String.valueOf(availablePoints));
         }
 
         // === TALENT TREE SECTION ===
         cmd.set("#TalentTreeSection.Visible", true);
+        cmd.set("#ContentSpacer.Visible", false);
 
         // Points display row
         int totalSpent = allocations.values().stream().mapToInt(Integer::intValue).sum();
@@ -129,31 +158,29 @@ public class ClassesContentRenderer {
         events.addEventBinding(CustomUIEventBindingType.Activating, "#TalentResetBtn",
             EventData.of("Action", "action:talent:reset:all"), false);
 
-        // Render each tier
-        int tierCount = tree.getTierCount();
-        for (int tier = 0; tier < Math.min(tierCount, 4); tier++) {
+        // Render all tiers — nothing is hidden, just locked/disabled
+        int tierCount = Math.min(tree.getTierCount(), MAX_UI_TIERS);
+        for (int tier = 0; tier < tierCount; tier++) {
             List<Talent> tierTalents = tree.getTalentsAtTier(tier);
-            renderTier(cmd, events, tier, tierTalents, allocations, availablePoints, playerLevel, tree);
-        }
-
-        // Hide unused tier rows
-        for (int tier = tierCount; tier < 4; tier++) {
-            cmd.set("#TalentTier" + tier + ".Visible", false);
+            renderTier(cmd, events, tier, tierTalents, allocations, availablePoints, classLevel, tree);
         }
 
         // Footer
         cmd.set("#FooterText.Text", "Click a talent to spend points. Reset refunds all allocated points.");
     }
 
+    // Max node slots per tier: 4 for tiers 0-3 (single row), 8 for tiers 4+ (two rows)
+    private static final int MAX_NODES_CORE = 4;
+    private static final int MAX_NODES_BRANCH = 8;
+
     private void renderTier(UICommandBuilder cmd, UIEventBuilder events, int tier,
                            List<Talent> talents, Map<String, Integer> allocations,
                            int availablePoints, int playerLevel, TalentTree tree) {
         String tierPrefix = "#TalentTier" + tier;
+        int maxSlots = tier >= 4 ? MAX_NODES_BRANCH : MAX_NODES_CORE;
 
-        cmd.set(tierPrefix + ".Visible", true);
-
-        // Render up to 4 talents per tier
-        for (int slot = 0; slot < 4; slot++) {
+        // Render all node slots
+        for (int slot = 0; slot < maxSlots; slot++) {
             String wrapPrefix = tierPrefix + "Node" + slot + "Wrap";
             String btnPrefix = tierPrefix + "Node" + slot + "Btn";
             String rankId = tierPrefix + "Node" + slot + "Rank";
@@ -165,6 +192,11 @@ public class ClassesContentRenderer {
                 // Hide unused slot
                 cmd.set(wrapPrefix + ".Visible", false);
             }
+        }
+
+        // For tiers 4+, show/hide RowB based on whether we need > 4 slots
+        if (tier >= 4) {
+            cmd.set(tierPrefix + "RowB.Visible", talents.size() > 4);
         }
     }
 
@@ -180,34 +212,30 @@ public class ClassesContentRenderer {
 
         cmd.set(wrapPrefix + ".Visible", true);
 
-        // Set button background and text color based on state
+        // Choose text color based on state
+        Color textColorObj = switch (state) {
+            case LOCKED -> Color.decode(COLOR_LOCKED_TEXT);
+            case AVAILABLE -> Color.decode(COLOR_AVAILABLE_TEXT);
+            case MAXED -> Color.decode(COLOR_MAXED_TEXT);
+        };
+
+        // Set button background via .Background (buttons support this directly)
         String bgColor = switch (state) {
             case LOCKED -> COLOR_LOCKED_BG;
             case AVAILABLE -> COLOR_AVAILABLE_BG;
             case MAXED -> COLOR_MAXED_BG;
         };
-        String textColor = switch (state) {
-            case LOCKED -> COLOR_LOCKED_TEXT;
-            case AVAILABLE -> COLOR_AVAILABLE_TEXT;
-            case MAXED -> COLOR_MAXED_TEXT;
-        };
+        cmd.set(btnPrefix + ".Background", bgColor);
 
-        // Set button style properties individually
-        cmd.set(btnPrefix + ".Style.Default.Background", bgColor);
-        cmd.set(btnPrefix + ".Style.Default.LabelStyle.TextColor", textColor);
-        cmd.set(btnPrefix + ".Style.Hovered.Background", bgColor);
-        cmd.set(btnPrefix + ".Style.Hovered.LabelStyle.TextColor", textColor);
-
-        // Set talent abbreviation (first 3 letters capitalized)
+        // Set talent abbreviation via .TextSpans with color
         String abbrev = talent.getName().length() > 3
             ? talent.getName().substring(0, 3).toUpperCase()
             : talent.getName().toUpperCase();
-        cmd.set(btnPrefix + ".Text", abbrev);
+        cmd.set(btnPrefix + ".TextSpans", Message.raw(abbrev).color(textColorObj));
 
         // Set rank display
         String rankText = currentRank + "/" + maxRank;
-        cmd.set(rankId + ".Text", rankText);
-        cmd.set(rankId + ".Style.TextColor", textColor);
+        cmd.set(rankId + ".TextSpans", Message.raw(rankText).color(textColorObj));
 
         // Build tooltip (set on wrapper for hover area)
         String tooltip = buildTooltip(talent, currentRank, state, allocations, playerLevel, tree);
@@ -255,19 +283,6 @@ public class ClassesContentRenderer {
             }
         }
 
-        // Show exclusions if any
-        if (!talent.getExclusions().isEmpty()) {
-            sb.append("\n\nExcludes:");
-            for (String excludeId : talent.getExclusions()) {
-                Talent exclude = tree.getTalent(excludeId);
-                if (exclude != null) {
-                    boolean hasExcluded = allocations.getOrDefault(excludeId, 0) > 0;
-                    String status = hasExcluded ? " [BLOCKED]" : "";
-                    sb.append("\n  - ").append(exclude.getName()).append(status);
-                }
-            }
-        }
-
         // Show reason if locked
         if (state == NodeState.LOCKED) {
             String error = tree.canLearnTalent(talent.getId(), allocations, playerLevel);
@@ -297,6 +312,28 @@ public class ClassesContentRenderer {
         if (!HC_ClassesAPI.isAvailable()) return 0;
 
         return HC_ClassesAPI.resetTalents(playerRef);
+    }
+
+    private int getPlayerLevel() {
+        try {
+            Class<?> apiClass = Class.forName("com.hcleveling.api.HC_LevelingAPI");
+            var isAvailableMethod = apiClass.getMethod("isAvailable");
+            Boolean isAvailable = (Boolean) isAvailableMethod.invoke(null);
+            if (!isAvailable) return 1;
+
+            var getLevelMethod = apiClass.getMethod("getPlayerLevel", java.util.UUID.class);
+            return (Integer) getLevelMethod.invoke(null, playerRef.getUuid());
+        } catch (Exception e) {
+            return 1;
+        }
+    }
+
+    private String getFactionId() {
+        HC_FactionsPlugin factionsPlugin = HC_FactionsPlugin.getInstance();
+        if (factionsPlugin == null) return null;
+
+        PlayerData playerData = factionsPlugin.getPlayerDataRepository().getPlayerData(playerRef.getUuid());
+        return playerData != null ? playerData.getFactionId() : null;
     }
 
     private enum NodeState {

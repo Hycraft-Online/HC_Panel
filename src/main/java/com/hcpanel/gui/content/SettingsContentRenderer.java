@@ -1,6 +1,5 @@
 package com.hcpanel.gui.content;
 
-import com.hcattributes.HC_AttributesPlugin;
 import com.hcpanel.gui.UnifiedPanelGui.SidebarButton;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
@@ -55,8 +54,7 @@ public class SettingsContentRenderer {
     }
 
     private void renderCombatSettings(UICommandBuilder cmd, UIEventBuilder events) {
-        HC_AttributesPlugin attrPlugin = HC_AttributesPlugin.getInstance();
-        boolean sctOn = attrPlugin != null && attrPlugin.isSctEnabled(playerRef.getUuid());
+        boolean sctOn = isSctEnabled();
 
         String accentColor = sctOn ? "#4aff7f" : "#e74c3c";
         String statusText = sctOn ? "ON" : "OFF";
@@ -79,12 +77,25 @@ public class SettingsContentRenderer {
 
     public void handleToggle(PlayerRef playerRef, String setting, World world) {
         if (!"sbt_toggle".equals(setting)) return;
+        try {
+            Class<?> clazz = Class.forName("com.hcattributes.HC_AttributesPlugin");
+            Object plugin = clazz.getMethod("getInstance").invoke(null);
+            if (plugin == null) return;
+            boolean current = (boolean) clazz.getMethod("isSctEnabled", java.util.UUID.class).invoke(plugin, playerRef.getUuid());
+            clazz.getMethod("setSctEnabled", java.util.UUID.class, boolean.class, World.class, PlayerRef.class)
+                .invoke(plugin, playerRef.getUuid(), !current, world, playerRef);
+        } catch (Exception ignored) {}
+    }
 
-        HC_AttributesPlugin attrPlugin = HC_AttributesPlugin.getInstance();
-        if (attrPlugin == null) return;
-
-        boolean current = attrPlugin.isSctEnabled(playerRef.getUuid());
-        attrPlugin.setSctEnabled(playerRef.getUuid(), !current, world, playerRef);
+    private boolean isSctEnabled() {
+        try {
+            Class<?> clazz = Class.forName("com.hcattributes.HC_AttributesPlugin");
+            Object plugin = clazz.getMethod("getInstance").invoke(null);
+            if (plugin == null) return false;
+            return (boolean) clazz.getMethod("isSctEnabled", java.util.UUID.class).invoke(plugin, playerRef.getUuid());
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private void resetGuideElements(UICommandBuilder cmd) {

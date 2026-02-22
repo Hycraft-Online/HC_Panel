@@ -14,11 +14,7 @@ import com.hcattributes.api.HC_AttributesAPI;
 import com.hcattributes.models.Attribute;
 import com.hcattributes.models.AttributeSnapshot;
 
-// Direct imports from HC_Classes (optional dependency)
-import com.hcclasses.api.HC_ClassesAPI;
-import com.hcclasses.models.PlayerClass;
-
-// HC_Leveling is optional - we use reflection to avoid compile-time dependency
+// HC_Leveling and HC_Classes are optional - we use reflection to avoid compile-time dependency
 
 // Direct imports from HC_Factions (optional dependency)
 import com.hcfactions.HC_FactionsPlugin;
@@ -155,18 +151,26 @@ public class AttributesContentRenderer {
         cmd.set("#CombatResourcesRow.Visible", true);
         cmd.set("#AttrCombatResourcesSpacer.Visible", true);
 
-        // Combat stats
+        // Combat stats - show AP and the bonus damage it provides per hit
         int meleeAP = snapshot.getMeleeAttackPower();
         int rangedAP = snapshot.getRangedAttackPower();
         int spellPower = snapshot.getSpellPower();
         float critChance = snapshot.getCritChance();
 
-        cmd.set("#MeleeAPValue.Text", String.valueOf(meleeAP));
-        cmd.set("#RangedAPValue.Text", String.valueOf(rangedAP));
-        cmd.set("#SpellPowerValue.Text", String.valueOf(spellPower));
+        // Show bonus damage prominently (AP/2), with AP in smaller text below
+        int meleeBonusDmg = Math.round(snapshot.getAttackPowerBonusDamage("melee"));
+        int rangedBonusDmg = Math.round(snapshot.getAttackPowerBonusDamage("ranged"));
+        int spellBonusDmg = Math.round(snapshot.getAttackPowerBonusDamage("magic"));
+
+        cmd.set("#MeleeAPValue.Text", "+" + meleeBonusDmg);
+        cmd.set("#MeleeAPDetail.Text", meleeAP + " AP");
+        cmd.set("#RangedAPValue.Text", "+" + rangedBonusDmg);
+        cmd.set("#RangedAPDetail.Text", rangedAP + " AP");
+        cmd.set("#SpellPowerValue.Text", "+" + spellBonusDmg);
+        cmd.set("#SpellPowerDetail.Text", spellPower + " SP");
         cmd.set("#CritChanceValue.Text", String.format("%.1f%%", critChance * 100));
 
-        // Resource stats - show Base + Vitality Bonus = Total
+        // Resource stats - show Base + Vitality/Intellect Bonus = Total
         int vitality = snapshot.getAttributeValue(Attribute.VITALITY);
         int intellect = snapshot.getAttributeValue(Attribute.INTELLECT);
         int hpBonus = vitality * 10;  // Same formula as AttributeManager.syncEntityStats
@@ -177,19 +181,19 @@ public class AttributesContentRenderer {
         // Get base HP/MP from engine (cached on world thread during stat sync)
         int baseHP = HC_AttributesAPI.getBaseMaxHealth(playerRef.getUuid());
         int baseMP = HC_AttributesAPI.getBaseMaxMana(playerRef.getUuid());
+
         int totalHP = baseHP + hpBonus;
         int totalMP = baseMP + mpBonus;
 
-        // Show as "Base + Bonus = Total" or just bonus if base not available
         if (baseHP > 0) {
-            cmd.set("#MaxHPValue.Text", String.format("%d+%d=%d", baseHP, hpBonus, totalHP));
+            cmd.set("#MaxHPValue.Text", String.format("%d+%d = %d", baseHP, hpBonus, totalHP));
         } else {
-            cmd.set("#MaxHPValue.Text", "+" + hpBonus);
+            cmd.set("#MaxHPValue.Text", String.format("+%d = %d", hpBonus, totalHP));
         }
         if (baseMP > 0) {
-            cmd.set("#MaxMPValue.Text", String.format("%d+%d=%d", baseMP, mpBonus, totalMP));
+            cmd.set("#MaxMPValue.Text", String.format("%d+%d = %d", baseMP, mpBonus, totalMP));
         } else {
-            cmd.set("#MaxMPValue.Text", "+" + mpBonus);
+            cmd.set("#MaxMPValue.Text", String.format("+%d = %d", mpBonus, totalMP));
         }
         cmd.set("#HPRegenValue.Text", String.format("+%.1f/s", hpRegen));
         cmd.set("#MPRegenValue.Text", String.format("+%.1f/s", mpRegen));
@@ -297,11 +301,10 @@ public class AttributesContentRenderer {
     }
 
     private String getAttributeDescription(int index, int value) {
-        // Matches original HC_Attributes_Panel.ui derived stat display format
         return switch (index) {
-            case 0 -> "+" + (value * 2) + " Melee AP";  // STR: 2 AP per point
+            case 0 -> "+" + (value * 2) + " AP (+" + value + " dmg)";  // STR: 2 AP, AP/2 bonus dmg
             case 1 -> "+" + (value * 2) + " RAP, +" + String.format("%.1f", value / 20.0) + "% Crit";  // AGI: 2 RAP, 1% crit per 20
-            case 2 -> "+" + (value * 2) + " SP, +" + (value * 15) + " MP";  // INT: 2 SP, 15 MP per point
+            case 2 -> "+" + (value * 2) + " SP (+" + value + " dmg), +" + (value * 15) + " MP";  // INT: 2 SP, AP/2 bonus dmg
             case 3 -> "+" + String.format("%.1f", value * 0.5) + " HP/t, +" + String.format("%.1f", value * 1.0) + " MP/t";  // SPI: 0.5 HP, 1.0 MP regen
             case 4 -> "+" + (value * 10) + " HP";  // VIT: 10 HP per point
             default -> "";
@@ -309,9 +312,16 @@ public class AttributesContentRenderer {
     }
 
     private String getClassName() {
-        if (!HC_ClassesAPI.isAvailable()) return "Adventurer";
-        PlayerClass playerClass = HC_ClassesAPI.getPlayerClass(playerRef.getUuid());
-        return playerClass != null ? playerClass.getDisplayName() : "Adventurer";
+        try {
+            Class<?> api = Class.forName("com.hcclasses.api.HC_ClassesAPI");
+            boolean available = (boolean) api.getMethod("isAvailable").invoke(null);
+            if (!available) return "Adventurer";
+            Object playerClass = api.getMethod("getPlayerClass", java.util.UUID.class).invoke(null, playerRef.getUuid());
+            if (playerClass == null) return "Adventurer";
+            return (String) playerClass.getClass().getMethod("getDisplayName").invoke(playerClass);
+        } catch (Exception e) {
+            return "Adventurer";
+        }
     }
 
     private int getPlayerLevel() {

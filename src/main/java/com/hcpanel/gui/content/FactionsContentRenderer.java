@@ -17,8 +17,12 @@ import com.hcfactions.models.GuildInvitation;
 import com.hcfactions.models.GuildRole;
 import com.hcfactions.models.PlayerData;
 
+import com.hypixel.hytale.server.core.universe.Universe;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -27,9 +31,14 @@ import java.util.UUID;
 public class FactionsContentRenderer {
 
     private final PlayerRef playerRef;
+    private String browserSearch;
 
     public FactionsContentRenderer(PlayerRef playerRef) {
         this.playerRef = playerRef;
+    }
+
+    public void setBrowserSearch(String search) {
+        this.browserSearch = search;
     }
 
     // ========== Plugin access ==========
@@ -114,32 +123,12 @@ public class FactionsContentRenderer {
         return plugin.getPlayerDataRepository().getPlayerData(playerRef.getUuid());
     }
 
-    /**
-     * Sets up the shared faction header (tag + player/guild name).
-     */
-    private void setupFactionHeader(UICommandBuilder cmd, Faction faction, String title, String subtitle) {
-        cmd.set("#HeaderSection.Visible", false);
-        cmd.set("#FactionHeaderSection.Visible", true);
-
-        if (faction != null) {
-            cmd.set("#FactionTagLarge.Text", "[" + faction.getShortName() + "]");
-            cmd.set("#FactionTagLarge.Style.TextColor", faction.getColorHex());
-        } else {
-            cmd.set("#FactionTagLarge.Text", "[???]");
-            cmd.set("#FactionTagLarge.Style.TextColor", "#96a9be");
-        }
-
-        cmd.set("#FactionPlayerName.Text", title);
-        if (subtitle != null) {
-            cmd.set("#FactionGuildName.Text", subtitle);
-        }
-    }
-
     private String getRoleColor(GuildRole role) {
         if (role == null) return "#ffffff";
         return switch (role) {
             case LEADER -> "#FFD700";
             case OFFICER -> "#4FC3F7";
+            case SENIOR -> "#66BB6A";
             case MEMBER -> "#81C784";
             case RECRUIT -> "#BDBDBD";
         };
@@ -165,7 +154,7 @@ public class FactionsContentRenderer {
     // ========== Content rendering ==========
 
     public void renderContent(UICommandBuilder cmd, UIEventBuilder events, Store<EntityStore> store,
-                               PlayerRef playerRef, String view) {
+                               PlayerRef playerRef, String view, String subView) {
         if (!isFactionsAvailable()) {
             cmd.set("#ContentText.Visible", true);
             cmd.set("#ContentText.Text", "Factions system not available.");
@@ -176,9 +165,9 @@ public class FactionsContentRenderer {
 
         switch (view) {
             case "guild" -> renderGuild(cmd, events);
-            case "members" -> renderMembers(cmd, events);
-            case "browser" -> renderBrowser(cmd, events);
-            case "invitations" -> renderInvitations(cmd, events);
+            case "members" -> renderMembers(cmd, events, subView);
+            case "browser" -> renderBrowser(cmd, events, subView);
+            case "invitations" -> renderInvitations(cmd, events, subView);
             case "overview" -> renderOverview(cmd, events);
             default -> renderGuild(cmd, events);
         }
@@ -195,7 +184,7 @@ public class FactionsContentRenderer {
         PlayerData playerData = resolvePlayerData();
         Faction faction = resolveFaction();
 
-        setupFactionHeader(cmd, faction, playerRef.getUsername(), guild.getName());
+
 
         // Stats section
         cmd.set("#FactionStatsSection.Visible", true);
@@ -221,27 +210,49 @@ public class FactionsContentRenderer {
         int claimCount = plugin.getClaimManager().getClaimCount(guild.getId());
         int maxClaims = plugin.getClaimManager().getMaxClaims(guild.getId());
         cmd.set("#ClaimsValue.Text", claimCount + "/" + maxClaims);
-        if (claimCount >= maxClaims) {
-            cmd.set("#ClaimsDesc.Text", "at capacity!");
+
+        // Progress bar: Anchor width out of 318px (card inner width)
+        // Layout: 960 panel - 200 sidebar = 760 right panel - 40 padding = 720
+        // Two cards FlexWeight:1 with 12px gap = (720-12)/2 = 354 - 36 padding = 318
+        int maxBarWidth = 318;
+        int barWidth;
+        if (claimCount > maxClaims) {
+            cmd.set("#ClaimsDesc.Text", "over limit!");
             cmd.set("#ClaimsValue.Style.TextColor", "#ff6b6b");
+            cmd.set("#ClaimsProgressBar.Background", "#ff6b6b");
+            barWidth = maxBarWidth;
+        } else if (claimCount >= maxClaims && maxClaims > 0) {
+            cmd.set("#ClaimsDesc.Text", "fully claimed");
+            cmd.set("#ClaimsValue.Style.TextColor", "#FFD700");
+            cmd.set("#ClaimsProgressBar.Background", "#FFD700");
+            barWidth = maxBarWidth;
+        } else if (maxClaims > 0 && claimCount > 0) {
+            cmd.set("#ClaimsDesc.Text", "chunks claimed");
+            cmd.set("#ClaimsProgressBar.Background", "#9CCC65");
+            barWidth = Math.max(1, (int)((double) maxBarWidth * claimCount / maxClaims));
         } else {
             cmd.set("#ClaimsDesc.Text", "chunks claimed");
+            cmd.set("#ClaimsProgressBar.Background", "#9CCC65");
+            barWidth = 0;
         }
+        com.hypixel.hytale.server.core.ui.Anchor claimsBarAnchor = new com.hypixel.hytale.server.core.ui.Anchor();
+        claimsBarAnchor.setWidth(com.hypixel.hytale.server.core.ui.Value.of(barWidth));
+        claimsBarAnchor.setHeight(com.hypixel.hytale.server.core.ui.Value.of(8));
+        cmd.setObject("#ClaimsProgressBar.Anchor", claimsBarAnchor);
 
         int powerPerMember = plugin.getConfig().getGuildDefaultPower();
-        cmd.set("#PowerFormula.Text", memberCount + " x " + powerPerMember + " = " + power);
-        cmd.set("#PowerPerMember.Text", "+" + powerPerMember + " power per member");
+        cmd.set("#PowerFormula.Text", "Base: " + powerPerMember + " per member");
+        cmd.set("#PowerPerMember.Text", "Total: " + power + " (" + memberCount + " members)");
         cmd.set("#MaxClaimsInfo.Text", "Max claims: " + maxClaims);
 
         // Tag editor (officers+)
         if (guildRole != null && guildRole.hasAtLeast(GuildRole.OFFICER)) {
             cmd.set("#GuildTagSection.Visible", true);
 
+            // Pre-fill the input with current tag
             String currentTag = guild.getTag();
             if (currentTag != null && !currentTag.isEmpty()) {
-                cmd.set("#CurrentTagLabel.Text", "Current: [" + currentTag + "]");
-            } else {
-                cmd.set("#CurrentTagLabel.Text", "No tag set");
+                cmd.set("#GuildTagInput.Value", currentTag);
             }
 
             events.addEventBinding(CustomUIEventBindingType.ValueChanged, "#GuildTagInput",
@@ -256,9 +267,7 @@ public class FactionsContentRenderer {
         cmd.set("#FactionQuickInfo.Visible", true);
         String factionName = faction != null ? faction.getDisplayName() : "Unknown";
         cmd.set("#QuickInfoText.Text",
-            "Faction: " + factionName + "\n" +
-            "Power determines your max land claims.\n" +
-            "Each active member contributes +" + powerPerMember + " power.");
+            factionName + " -- Power drives land claims. Recruit members to grow stronger.");
 
         // Leave guild (non-leaders)
         if (guildRole != GuildRole.LEADER) {
@@ -273,8 +282,6 @@ public class FactionsContentRenderer {
     private void renderNoGuild(UICommandBuilder cmd, UIEventBuilder events) {
         Faction faction = resolveFaction();
 
-        setupFactionHeader(cmd, faction, playerRef.getUsername(), null);
-        cmd.set("#FactionGuildName.Visible", false);
 
         // Create guild section (only if player has a faction)
         if (faction != null) {
@@ -299,7 +306,9 @@ public class FactionsContentRenderer {
         cmd.set("#FooterText.Text", "Join a guild to access land claims and group features.");
     }
 
-    private void renderMembers(UICommandBuilder cmd, UIEventBuilder events) {
+    private static final int MEMBERS_PER_PAGE = 20;
+
+    private void renderMembers(UICommandBuilder cmd, UIEventBuilder events, String pageParam) {
         Guild guild = resolveGuild();
         if (guild == null) {
             cmd.set("#ContentText.Visible", true);
@@ -312,7 +321,7 @@ public class FactionsContentRenderer {
         PlayerData myData = resolvePlayerData();
         GuildRole myRole = myData != null ? myData.getGuildRole() : null;
 
-        setupFactionHeader(cmd, faction, guild.getName(), "Guild Members");
+
 
         // Invite section (officers+)
         if (myRole != null && myRole.hasAtLeast(GuildRole.OFFICER)) {
@@ -326,21 +335,43 @@ public class FactionsContentRenderer {
         // Member list
         cmd.set("#MemberListSection.Visible", true);
         List<PlayerData> members = plugin.getGuildManager().getGuildMembers(guild.getId());
+        int totalMembers = members.size();
+        int totalPages = Math.max(1, (totalMembers + MEMBERS_PER_PAGE - 1) / MEMBERS_PER_PAGE);
 
-        int index = 0;
-        for (PlayerData member : members) {
-            if (index >= 7) break;
+        // Parse current page
+        int currentPage = 1;
+        if (pageParam != null) {
+            try {
+                currentPage = Integer.parseInt(pageParam);
+            } catch (NumberFormatException ignored) {}
+        }
+        currentPage = Math.max(1, Math.min(currentPage, totalPages));
 
+        int startIndex = (currentPage - 1) * MEMBERS_PER_PAGE;
+        int endIndex = Math.min(startIndex + MEMBERS_PER_PAGE, totalMembers);
+
+        // Build set of online player UUIDs
+        Set<UUID> onlineUuids = new HashSet<>();
+        for (PlayerRef onlinePlayer : Universe.get().getPlayers()) {
+            onlineUuids.add(onlinePlayer.getUuid());
+        }
+
+        int rowIndex = 0;
+        for (int i = startIndex; i < endIndex; i++) {
+            PlayerData member = members.get(i);
             UUID memberUuid = member.getPlayerUuid();
             GuildRole memberRole = member.getGuildRole();
             String roleColor = getRoleColor(memberRole);
 
-            cmd.set("#MemberRow" + index + ".Visible", true);
-            cmd.set("#MemberName" + index + ".Text", member.getPlayerName());
-            cmd.set("#MemberRole" + index + ".Text",
+            cmd.set("#MemberRow" + rowIndex + ".Visible", true);
+            cmd.set("#MemberName" + rowIndex + ".Text", member.getPlayerName());
+            cmd.set("#MemberRole" + rowIndex + ".Text",
                 memberRole != null ? "[" + memberRole.getDisplayName() + "]" : "[Member]");
-            cmd.set("#MemberRole" + index + ".Style.TextColor", roleColor);
-            cmd.set("#OnlineIndicator" + index + ".Background", "#757575");
+            cmd.set("#MemberRole" + rowIndex + ".Style.TextColor", roleColor);
+
+            // Online status indicator
+            boolean isOnline = onlineUuids.contains(memberUuid);
+            cmd.set("#OnlineIndicator" + rowIndex + ".Background", isOnline ? "#4aff7f" : "#757575");
 
             boolean isSelf = memberUuid.equals(playerRef.getUuid());
             boolean canManage = myRole != null && !isSelf && canManageMember(myRole, memberRole);
@@ -351,40 +382,61 @@ public class FactionsContentRenderer {
                 boolean canPromote = memberRole != null && memberRole != GuildRole.LEADER &&
                     (myRole == GuildRole.LEADER || memberRole.ordinal() > myRole.ordinal() + 1);
                 if (canPromote) {
-                    cmd.set("#MemberPromote" + index + ".Visible", true);
-                    events.addEventBinding(CustomUIEventBindingType.Activating, "#MemberPromote" + index,
+                    cmd.set("#MemberPromote" + rowIndex + ".Visible", true);
+                    events.addEventBinding(CustomUIEventBindingType.Activating, "#MemberPromote" + rowIndex,
                         EventData.of("Action", "action:promote:" + memberIdStr), false);
                 }
 
                 boolean canDemote = memberRole != null && memberRole != GuildRole.RECRUIT &&
                     memberRole != GuildRole.LEADER;
                 if (canDemote) {
-                    cmd.set("#MemberDemote" + index + ".Visible", true);
-                    events.addEventBinding(CustomUIEventBindingType.Activating, "#MemberDemote" + index,
+                    cmd.set("#MemberDemote" + rowIndex + ".Visible", true);
+                    events.addEventBinding(CustomUIEventBindingType.Activating, "#MemberDemote" + rowIndex,
                         EventData.of("Action", "action:demote:" + memberIdStr), false);
                 }
 
-                cmd.set("#MemberKick" + index + ".Visible", true);
-                events.addEventBinding(CustomUIEventBindingType.Activating, "#MemberKick" + index,
+                cmd.set("#MemberKick" + rowIndex + ".Visible", true);
+                events.addEventBinding(CustomUIEventBindingType.Activating, "#MemberKick" + rowIndex,
                     EventData.of("Action", "action:kick:" + memberIdStr), false);
             }
 
-            index++;
+            rowIndex++;
         }
 
-        for (int i = index; i < 7; i++) {
+        for (int i = rowIndex; i < MEMBERS_PER_PAGE; i++) {
             cmd.set("#MemberRow" + i + ".Visible", false);
         }
 
-        cmd.set("#FooterText.Text", "^ Promote  v Demote  X Kick");
+        // Pagination controls
+        if (totalPages > 1) {
+            cmd.set("#MemberPagination.Visible", true);
+            cmd.set("#MemberPageInfo.Text", "Page " + currentPage + " of " + totalPages);
+
+            if (currentPage > 1) {
+                cmd.set("#MemberPrevPage.Visible", true);
+                events.addEventBinding(CustomUIEventBindingType.Activating, "#MemberPrevPage",
+                    EventData.of("Action", "nav:factions:members:" + (currentPage - 1)), false);
+            }
+
+            if (currentPage < totalPages) {
+                cmd.set("#MemberNextPage.Visible", true);
+                events.addEventBinding(CustomUIEventBindingType.Activating, "#MemberNextPage",
+                    EventData.of("Action", "nav:factions:members:" + (currentPage + 1)), false);
+            }
+        }
+
+        cmd.set("#FooterText.Text", totalMembers + " member" + (totalMembers != 1 ? "s" : "") + " in guild"
+            + (totalPages > 1 ? " (showing " + (startIndex + 1) + "-" + endIndex + ")" : ""));
     }
 
-    private void renderBrowser(UICommandBuilder cmd, UIEventBuilder events) {
+    private static final int GUILDS_PER_PAGE = 6;
+
+    private void renderBrowser(UICommandBuilder cmd, UIEventBuilder events, String pageParam) {
         HC_FactionsPlugin plugin = getPlugin();
         PlayerData playerData = resolvePlayerData();
         Faction faction = resolveFaction();
 
-        setupFactionHeader(cmd, faction, "Guild Browser", "Find a guild to join");
+
 
         String playerFactionId = playerData != null ? playerData.getFactionId() : null;
         if (playerFactionId == null) {
@@ -396,94 +448,194 @@ public class FactionsContentRenderer {
 
         cmd.set("#GuildListSection.Visible", true);
         boolean playerInGuild = playerData.isInGuild();
-        List<Guild> guilds = plugin.getGuildManager().getGuildsByFaction(playerFactionId);
+        List<Guild> guilds = new ArrayList<>(plugin.getGuildManager().getGuildsByFaction(playerFactionId));
 
-        int index = 0;
-        for (Guild guildObj : guilds) {
-            if (index >= 6) break;
+        // Sort by power descending, then alphabetically by name
+        guilds.sort((a, b) -> {
+            int powerCmp = Integer.compare(b.getPower(), a.getPower());
+            if (powerCmp != 0) return powerCmp;
+            return a.getName().compareToIgnoreCase(b.getName());
+        });
+
+        // Search bar bindings
+        events.addEventBinding(CustomUIEventBindingType.ValueChanged, "#BrowserSearchInput",
+            EventData.of("@BrowserSearchInput", "#BrowserSearchInput.Value"), false);
+        events.addEventBinding(CustomUIEventBindingType.Activating, "#BrowserSearchBtn",
+            EventData.of("Action", "action:browser_search:submit")
+                .append("@BrowserSearchInput", "#BrowserSearchInput.Value"), false);
+
+        // Pre-fill search if present
+        if (browserSearch != null && !browserSearch.isBlank()) {
+            cmd.set("#BrowserSearchInput.Value", browserSearch);
+            String searchLower = browserSearch.toLowerCase();
+            guilds.removeIf(g -> !g.getName().toLowerCase().contains(searchLower));
+        }
+
+        int totalGuilds = guilds.size();
+        int totalPages = Math.max(1, (totalGuilds + GUILDS_PER_PAGE - 1) / GUILDS_PER_PAGE);
+
+        // Parse current page
+        int currentPage = 1;
+        if (pageParam != null) {
+            try {
+                currentPage = Integer.parseInt(pageParam);
+            } catch (NumberFormatException ignored) {}
+        }
+        currentPage = Math.max(1, Math.min(currentPage, totalPages));
+
+        int startIndex = (currentPage - 1) * GUILDS_PER_PAGE;
+        int endIndex = Math.min(startIndex + GUILDS_PER_PAGE, totalGuilds);
+
+        int rowIndex = 0;
+        for (int i = startIndex; i < endIndex; i++) {
+            Guild guildObj = guilds.get(i);
 
             List<PlayerData> members = plugin.getGuildManager().getGuildMembers(guildObj.getId());
             int memberCount = members != null ? members.size() : 0;
             int maxMembers = plugin.getConfig().getGuildMaxMembers();
 
-            cmd.set("#GuildRow" + index + ".Visible", true);
-            cmd.set("#GuildName" + index + ".Text", guildObj.getName());
-            cmd.set("#GuildMembers" + index + ".Text", memberCount + "/" + maxMembers);
-            cmd.set("#GuildPower" + index + ".Text", guildObj.getPower() + " pwr");
+            cmd.set("#GuildRow" + rowIndex + ".Visible", true);
+            cmd.set("#GuildName" + rowIndex + ".Text", guildObj.getName());
+            cmd.set("#GuildMembers" + rowIndex + ".Text", memberCount + "/" + maxMembers);
+            cmd.set("#GuildPower" + rowIndex + ".Text", guildObj.getPower() + " pwr");
 
-            if (playerInGuild) {
-                cmd.set("#GuildJoin" + index + ".Visible", false);
-            } else {
-                cmd.set("#GuildJoin" + index + ".Visible", true);
-                events.addEventBinding(CustomUIEventBindingType.Activating, "#GuildJoin" + index,
+            if (!playerInGuild) {
+                cmd.set("#GuildJoin" + rowIndex + ".Visible", true);
+                cmd.set("#GuildJoinDisabled" + rowIndex + ".Visible", false);
+                events.addEventBinding(CustomUIEventBindingType.Activating, "#GuildJoin" + rowIndex,
                     EventData.of("Action", "action:guild_join:" + guildObj.getId().toString()), false);
+            } else {
+                cmd.set("#GuildJoin" + rowIndex + ".Visible", false);
+                cmd.set("#GuildJoinDisabled" + rowIndex + ".Visible", true);
             }
 
-            index++;
+            rowIndex++;
         }
 
-        for (int i = index; i < 6; i++) {
+        for (int i = rowIndex; i < GUILDS_PER_PAGE; i++) {
             cmd.set("#GuildRow" + i + ".Visible", false);
         }
 
-        if (index == 0) {
+        if (totalGuilds == 0) {
             cmd.set("#GuildListSection.Visible", false);
             cmd.set("#FactionQuickInfo.Visible", true);
-            cmd.set("#QuickInfoText.Text", "No guilds found for your faction.\n\nBe the first to create one using /guild create <name>");
+            if (browserSearch != null && !browserSearch.isBlank()) {
+                cmd.set("#QuickInfoText.Text", "No guilds match your search.\n\nTry a different search term or clear the search.");
+            } else {
+                cmd.set("#QuickInfoText.Text", "No guilds found for your faction.\n\nBe the first to create one using /guild create <name>");
+            }
         }
 
-        cmd.set("#FooterText.Text", playerInGuild
-            ? "You are already in a guild. Leave your current guild to join another."
-            : "Click JOIN to request membership.");
+        // Pagination controls
+        if (totalPages > 1) {
+            cmd.set("#GuildPagination.Visible", true);
+            cmd.set("#GuildPageInfo.Text", "Page " + currentPage + " of " + totalPages);
+
+            if (currentPage > 1) {
+                cmd.set("#GuildPrevPage.Visible", true);
+                events.addEventBinding(CustomUIEventBindingType.Activating, "#GuildPrevPage",
+                    EventData.of("Action", "nav:factions:browser:" + (currentPage - 1)), false);
+            }
+
+            if (currentPage < totalPages) {
+                cmd.set("#GuildNextPage.Visible", true);
+                events.addEventBinding(CustomUIEventBindingType.Activating, "#GuildNextPage",
+                    EventData.of("Action", "nav:factions:browser:" + (currentPage + 1)), false);
+            }
+        }
+
+        String footerBase = playerInGuild
+            ? "Leave your current guild to join another."
+            : "Click JOIN to request membership.";
+        cmd.set("#FooterText.Text", totalGuilds + " guild" + (totalGuilds != 1 ? "s" : "")
+            + (totalPages > 1 ? " (showing " + (startIndex + 1) + "-" + endIndex + ") - " : " - ") + footerBase);
     }
 
-    private void renderInvitations(UICommandBuilder cmd, UIEventBuilder events) {
+    private static final int INVITES_PER_PAGE = 5;
+
+    private void renderInvitations(UICommandBuilder cmd, UIEventBuilder events, String pageParam) {
         HC_FactionsPlugin plugin = getPlugin();
         Faction faction = resolveFaction();
 
-        setupFactionHeader(cmd, faction, "Invitations", "Pending guild invites");
+        List<GuildInvitation> invitations = plugin.getGuildManager().getPendingInvitations(playerRef.getUuid());
+        int totalInvites = invitations.size();
+
+        if (totalInvites == 0) {
+            cmd.set("#FactionQuickInfo.Visible", true);
+            cmd.set("#QuickInfoText.Text",
+                "No Pending Invitations\n\n" +
+                "Browse guilds or ask a guild officer to invite you.\n" +
+                "New invitations will appear here automatically.");
+            cmd.set("#FooterText.Text", "");
+            return;
+        }
 
         cmd.set("#InviteListSection.Visible", true);
-        List<GuildInvitation> invitations = plugin.getGuildManager().getPendingInvitations(playerRef.getUuid());
 
-        int index = 0;
-        for (GuildInvitation invitation : invitations) {
-            if (index >= 5) break;
+        int totalPages = Math.max(1, (totalInvites + INVITES_PER_PAGE - 1) / INVITES_PER_PAGE);
 
+        // Parse current page
+        int currentPage = 1;
+        if (pageParam != null) {
+            try {
+                currentPage = Integer.parseInt(pageParam);
+            } catch (NumberFormatException ignored) {}
+        }
+        currentPage = Math.max(1, Math.min(currentPage, totalPages));
+
+        int startIndex = (currentPage - 1) * INVITES_PER_PAGE;
+        int endIndex = Math.min(startIndex + INVITES_PER_PAGE, totalInvites);
+
+        int rowIndex = 0;
+        for (int i = startIndex; i < endIndex; i++) {
+            GuildInvitation invitation = invitations.get(i);
             UUID guildId = invitation.getGuildId();
             Guild guildObj = plugin.getGuildManager().getGuild(guildId);
             String guildName = guildObj != null ? guildObj.getName() : "Unknown Guild";
 
-            cmd.set("#InviteRow" + index + ".Visible", true);
-            cmd.set("#InviteGuildName" + index + ".Text", guildName);
-            cmd.set("#InviteFrom" + index + ".Text", "from " + invitation.getInviterName());
+            cmd.set("#InviteRow" + rowIndex + ".Visible", true);
+            cmd.set("#InviteGuildName" + rowIndex + ".Text", guildName);
+            cmd.set("#InviteFrom" + rowIndex + ".Text", "from " + invitation.getInviterName());
 
             String guildIdStr = guildId.toString();
-            events.addEventBinding(CustomUIEventBindingType.Activating, "#InviteAccept" + index,
+            events.addEventBinding(CustomUIEventBindingType.Activating, "#InviteAccept" + rowIndex,
                 EventData.of("Action", "action:invite_accept:" + guildIdStr), false);
-            events.addEventBinding(CustomUIEventBindingType.Activating, "#InviteDecline" + index,
+            events.addEventBinding(CustomUIEventBindingType.Activating, "#InviteDecline" + rowIndex,
                 EventData.of("Action", "action:invite_decline:" + guildIdStr), false);
 
-            index++;
+            rowIndex++;
         }
 
-        for (int i = index; i < 5; i++) {
+        for (int i = rowIndex; i < INVITES_PER_PAGE; i++) {
             cmd.set("#InviteRow" + i + ".Visible", false);
         }
 
-        if (index == 0) {
-            cmd.set("#InviteListSection.Visible", false);
-            cmd.set("#FactionQuickInfo.Visible", true);
-            cmd.set("#QuickInfoText.Text", "No pending invitations.\n\nBrowse guilds and request to join, or wait for guild officers to invite you.");
+        // Pagination controls
+        if (totalPages > 1) {
+            cmd.set("#InvitePagination.Visible", true);
+            cmd.set("#InvitePageInfo.Text", "Page " + currentPage + " of " + totalPages);
+
+            if (currentPage > 1) {
+                cmd.set("#InvitePrevPage.Visible", true);
+                events.addEventBinding(CustomUIEventBindingType.Activating, "#InvitePrevPage",
+                    EventData.of("Action", "nav:factions:invitations:" + (currentPage - 1)), false);
+            }
+
+            if (currentPage < totalPages) {
+                cmd.set("#InviteNextPage.Visible", true);
+                events.addEventBinding(CustomUIEventBindingType.Activating, "#InviteNextPage",
+                    EventData.of("Action", "nav:factions:invitations:" + (currentPage + 1)), false);
+            }
         }
 
-        cmd.set("#FooterText.Text", "Click ACCEPT or DECLINE to respond to invites.");
+        cmd.set("#FooterText.Text", totalInvites + " invitation" + (totalInvites != 1 ? "s" : "")
+            + (totalPages > 1 ? " (showing " + (startIndex + 1) + "-" + endIndex + ") - " : " - ")
+            + "Click ACCEPT or DECLINE to respond.");
     }
 
     private void renderOverview(UICommandBuilder cmd, UIEventBuilder events) {
         Faction faction = resolveFaction();
         if (faction == null) {
-            setupFactionHeader(cmd, null, "Faction Overview", "No faction selected");
             cmd.set("#FactionQuickInfo.Visible", true);
             cmd.set("#QuickInfoText.Text", "You must select a faction first.\n\nUse /faction to choose your faction.");
             cmd.set("#FooterText.Text", "Select a faction to view its overview.");
@@ -491,8 +643,7 @@ public class FactionsContentRenderer {
         }
 
         HC_FactionsPlugin plugin = getPlugin();
-        setupFactionHeader(cmd, faction, faction.getDisplayName(), "Faction Overview");
-        cmd.set("#FactionPlayerName.Style.TextColor", faction.getColorHex());
+
 
         // Faction-wide stats
         String factionId = faction.getId();
@@ -512,10 +663,31 @@ public class FactionsContentRenderer {
         cmd.set("#FactionStatsSection.Visible", true);
         cmd.set("#PowerValue.Text", String.valueOf(totalPower));
         cmd.set("#PowerDesc.Text", "combined power");
+        cmd.set("#PowerDesc.Style.TextColor", "#96a9be");
         cmd.set("#RankValue.Text", String.valueOf(guildCount));
-        cmd.set("#RankDesc.Text", "active guilds");
+        cmd.set("#RankDesc.Text", "total guilds");
+        cmd.set("#RankDesc.Style.TextColor", "#96a9be");
         cmd.set("#MemberCountValue.Text", String.valueOf(totalMembers));
         cmd.set("#MembersDesc.Text", "total players");
+        cmd.set("#MembersDesc.Style.TextColor", "#96a9be");
+
+        // Top 3 guilds leaderboard (sorted by power)
+        if (guilds != null && !guilds.isEmpty()) {
+            guilds.sort((a, b) -> Integer.compare(b.getPower(), a.getPower()));
+            cmd.set("#TopGuildsSection.Visible", true);
+
+            int topCount = Math.min(3, guilds.size());
+            for (int i = 0; i < topCount; i++) {
+                Guild g = guilds.get(i);
+                List<PlayerData> gMembers = plugin.getGuildManager().getGuildMembers(g.getId());
+                int gMemberCount = gMembers != null ? gMembers.size() : 0;
+
+                cmd.set("#TopGuildRow" + i + ".Visible", true);
+                cmd.set("#TopGuildName" + i + ".Text", g.getName());
+                cmd.set("#TopGuildPower" + i + ".Text", g.getPower() + " pwr");
+                cmd.set("#TopGuildMembers" + i + ".Text", gMemberCount + " members");
+            }
+        }
 
         cmd.set("#FactionQuickInfo.Visible", true);
         cmd.set("#QuickInfoText.Text",
