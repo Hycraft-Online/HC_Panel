@@ -170,33 +170,40 @@ public class AttributesContentRenderer {
         cmd.set("#SpellPowerDetail.Text", spellPower + " SP");
         cmd.set("#CritChanceValue.Text", String.format("%.1f%%", critChance * 100));
 
-        // Resource stats - show Base + Vitality/Intellect Bonus = Total
-        int vitality = snapshot.getAttributeValue(Attribute.VITALITY);
-        int intellect = snapshot.getAttributeValue(Attribute.INTELLECT);
-        int hpBonus = vitality * 10;  // Same formula as AttributeManager.syncEntityStats
-        int mpBonus = intellect * 15;  // Formula from AttributeSnapshot
+        // Resource stats - use actual max values from the engine (includes all modifiers)
         float hpRegen = snapshot.getHealthRegen();
         float mpRegen = snapshot.getManaRegen();
 
-        // Get base HP/MP from engine (cached on world thread during stat sync)
-        int baseHP = HC_AttributesAPI.getBaseMaxHealth(playerRef.getUuid());
-        int baseMP = HC_AttributesAPI.getBaseMaxMana(playerRef.getUuid());
+        int totalHP = HC_AttributesAPI.getActualMaxHealth(playerRef.getUuid());
+        int totalMP = HC_AttributesAPI.getActualMaxMana(playerRef.getUuid());
 
-        int totalHP = baseHP + hpBonus;
-        int totalMP = baseMP + mpBonus;
+        // HP column - per-line breakdown
+        int baseHP = 100;
+        int vitality = snapshot.getAttributeValue(Attribute.VITALITY);
+        int vitBonus = vitality * 10;
+        int hpBeforeMultiplier = baseHP + vitBonus;
+        // If total differs from base+vit, there's a class/talent multiplier
+        String classLine = "";
+        if (totalHP != hpBeforeMultiplier && hpBeforeMultiplier > 0) {
+            float effectiveMultiplier = (float) totalHP / hpBeforeMultiplier;
+            classLine = String.format("x%.2f Class/Talents", effectiveMultiplier);
+        }
 
-        if (baseHP > 0) {
-            cmd.set("#MaxHPValue.Text", String.format("%d+%d = %d", baseHP, hpBonus, totalHP));
-        } else {
-            cmd.set("#MaxHPValue.Text", String.format("+%d = %d", hpBonus, totalHP));
-        }
-        if (baseMP > 0) {
-            cmd.set("#MaxMPValue.Text", String.format("%d+%d = %d", baseMP, mpBonus, totalMP));
-        } else {
-            cmd.set("#MaxMPValue.Text", String.format("+%d = %d", mpBonus, totalMP));
-        }
-        cmd.set("#HPRegenValue.Text", String.format("+%.1f/s", hpRegen));
-        cmd.set("#MPRegenValue.Text", String.format("+%.1f/s", mpRegen));
+        cmd.set("#MaxHPValue.Text", String.valueOf(totalHP));
+        cmd.set("#HPLineBase.Text", baseHP + " Base");
+        cmd.set("#HPLineVit.Text", vitBonus > 0 ? "+" + vitBonus + " Vitality (" + vitality + ")" : "");
+        cmd.set("#HPLineClass.Text", classLine);
+        cmd.set("#HPLineRegen.Text", String.format("+%.1f/s regen", hpRegen));
+
+        // MP column - per-line breakdown
+        int baseMP = 50;
+        int intellect = snapshot.getAttributeValue(Attribute.INTELLECT);
+        int intBonus = intellect * 15;
+
+        cmd.set("#MaxMPValue.Text", String.valueOf(totalMP));
+        cmd.set("#MPLineBase.Text", baseMP + " Base");
+        cmd.set("#MPLineInt.Text", intBonus > 0 ? "+" + intBonus + " Intellect (" + intellect + ")" : "");
+        cmd.set("#MPLineRegen.Text", String.format("+%.1f/s regen", mpRegen));
 
         // === DEFENSE SECTION ===
         cmd.set("#DefenseSection.Visible", true);

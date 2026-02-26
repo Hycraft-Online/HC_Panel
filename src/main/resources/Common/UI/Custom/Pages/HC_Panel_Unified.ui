@@ -1721,7 +1721,7 @@ Group {
 
         Group { Anchor: (Width: 8); }
 
-        // Resources Card
+        // Resources Card - two columns: HP (left) and MP (right)
         Group {
           FlexWeight: 1;
           LayoutMode: Top;
@@ -1734,28 +1734,41 @@ Group {
             Style: (FontSize: 12, TextColor: @TextSecondary, RenderBold: true, LetterSpacing: 1);
           }
 
-          Group { Anchor: (Height: 6); }
-
-          // HP row - shows Base + Vitality Bonus = Total
-          Group {
-            LayoutMode: Left;
-            Anchor: (Height: 26);
-
-            Label { Text: "HP"; Anchor: (Width: 22); Style: (FontSize: 13, TextColor: #e74c3c, RenderBold: true, VerticalAlignment: Center); }
-            Label #MaxHPValue { Text: "0+0=0"; Anchor: (Width: 170); Style: (FontSize: 14, TextColor: #e74c3c, RenderBold: true, VerticalAlignment: Center); }
-            Label #HPRegenValue { Text: "+0/s"; FlexWeight: 1; Style: (FontSize: 12, TextColor: #555555, HorizontalAlignment: End, VerticalAlignment: Center); }
-          }
-
           Group { Anchor: (Height: 4); }
 
-          // MP row - shows Base + Intellect Bonus = Total
+          // Two-column layout: HP left, MP right
           Group {
             LayoutMode: Left;
-            Anchor: (Height: 26);
+            FlexWeight: 1;
 
-            Label { Text: "MP"; Anchor: (Width: 22); Style: (FontSize: 13, TextColor: #3498db, RenderBold: true, VerticalAlignment: Center); }
-            Label #MaxMPValue { Text: "0+0=0"; Anchor: (Width: 170); Style: (FontSize: 14, TextColor: #3498db, RenderBold: true, VerticalAlignment: Center); }
-            Label #MPRegenValue { Text: "+0/s"; FlexWeight: 1; Style: (FontSize: 12, TextColor: #555555, HorizontalAlignment: End, VerticalAlignment: Center); }
+            // HP Column
+            Group {
+              FlexWeight: 1;
+              LayoutMode: Top;
+
+              Label { Text: "HP"; Anchor: (Height: 14); Style: (FontSize: 13, TextColor: #e74c3c, RenderBold: true); }
+              Label #MaxHPValue { Text: "0"; Anchor: (Height: 16); Style: (FontSize: 15, TextColor: #e74c3c, RenderBold: true); }
+              Group { Anchor: (Height: 2); }
+              Label #HPLineBase { Text: ""; Anchor: (Height: 12); Style: (FontSize: 10, TextColor: #888888); }
+              Label #HPLineVit { Text: ""; Anchor: (Height: 12); Style: (FontSize: 10, TextColor: #888888); }
+              Label #HPLineClass { Text: ""; Anchor: (Height: 12); Style: (FontSize: 10, TextColor: #888888); }
+              Label #HPLineRegen { Text: ""; Anchor: (Height: 12); Style: (FontSize: 10, TextColor: #555555); }
+            }
+
+            Group { Anchor: (Width: 8); }
+
+            // MP Column
+            Group {
+              FlexWeight: 1;
+              LayoutMode: Top;
+
+              Label { Text: "MP"; Anchor: (Height: 14); Style: (FontSize: 13, TextColor: #3498db, RenderBold: true); }
+              Label #MaxMPValue { Text: "0"; Anchor: (Height: 16); Style: (FontSize: 15, TextColor: #3498db, RenderBold: true); }
+              Group { Anchor: (Height: 2); }
+              Label #MPLineBase { Text: ""; Anchor: (Height: 12); Style: (FontSize: 10, TextColor: #888888); }
+              Label #MPLineInt { Text: ""; Anchor: (Height: 12); Style: (FontSize: 10, TextColor: #888888); }
+              Label #MPLineRegen { Text: ""; Anchor: (Height: 12); Style: (FontSize: 10, TextColor: #555555); }
+            }
           }
         }
       }
