@@ -34,6 +34,9 @@ dependencies {
         : "$hytaleHome/$patchline/package/game/$game_build/Server/HytaleServer.jar"
     implementation(files(serverJarPath))
 
+    // HyUI — dynamic image system for avatar rendering
+    implementation(files("${rootProject.projectDir}/../../server-files/mods/HyUI-0.8.8-release-server-version.jar"))
+
     // Optional: compile against HC_Factions, HC_Honor, HC_Attributes for API access
     // These are optional dependencies - the plugin will detect them at runtime
     def hcFactionsJar = file("${rootProject.projectDir}/../HC_Factions/build/libs/HC_Factions-1.0.0.jar")
@@ -64,6 +67,11 @@ dependencies {
     def hcProfessionsJar = file("${rootProject.projectDir}/../HC_Professions/build/libs/HC_Professions-1.0.0.jar")
     if (hcProfessionsJar.exists()) {
         compileOnly(files(hcProfessionsJar))
+    }
+
+    def hcRecruitmentJar = file("${rootProject.projectDir}/../HC_Recruitment/build/libs/HC_Recruitment-1.0.0.jar")
+    if (hcRecruitmentJar.exists()) {
+        compileOnly(files(hcRecruitmentJar))
     }
 }
 

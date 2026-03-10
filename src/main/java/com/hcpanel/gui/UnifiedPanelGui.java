@@ -5,6 +5,7 @@ import com.hcpanel.gui.content.*;
 
 // HC_Factions is a required dependency
 import com.hcfactions.HC_FactionsPlugin;
+import com.hcfactions.gui.FactionMenuGui;
 // All other plugin deps are optional - detected at runtime via reflection
 
 import com.hypixel.hytale.codec.Codec;
@@ -57,6 +58,7 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
     private CharacterContentRenderer characterRenderer;
     private SettingsContentRenderer settingsRenderer;
     private SkillsContentRenderer skillsRenderer;
+    private RecruitmentContentRenderer recruitmentRenderer;
 
     // Pending input values
     private String pendingGuildName;
@@ -95,6 +97,7 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
         if (isModuleAvailable("character")) this.characterRenderer = new CharacterContentRenderer(playerRef);
         this.settingsRenderer = new SettingsContentRenderer(playerRef);
         if (isModuleAvailable("skills")) this.skillsRenderer = new SkillsContentRenderer(playerRef);
+        if (isModuleAvailable("recruitment")) this.recruitmentRenderer = new RecruitmentContentRenderer(playerRef);
     }
 
     public void setBrowserSearch(String search) {
@@ -124,8 +127,7 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
      */
     private void buildRootMenu(UICommandBuilder cmd, UIEventBuilder events) {
         // Header
-        cmd.set("#HeaderTitle.Text", "CHARACTER PANEL");
-        cmd.set("#HeaderTitle.Style.TextColor", "#d4af37");
+        cmd.set("#HeaderTitle.TextSpans", Message.raw("CHARACTER PANEL").color(Color.decode("#d4af37")));
         cmd.set("#HeaderSubtitle.Text", "Welcome, " + playerRef.getUsername());
 
         // Sidebar buttons - News and Guide first, then plugin-dependent modules
@@ -138,7 +140,7 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
         // Plugin-dependent modules
         if (isModuleAvailable("factions")) {
             String badge = factionsRenderer.getInvitationBadge();
-            buttons.add(new SidebarButton("Factions", "nav:factions:guild", badge, "#4a9eff"));
+            buttons.add(new SidebarButton("Guild", "open:guild", badge, "#4a9eff"));
         }
         if (isModuleAvailable("honor")) {
             buttons.add(new SidebarButton("Honor", "nav:honor:standing", null, "#d4af37"));
@@ -149,6 +151,10 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
         }
         if (isModuleAvailable("skills")) {
             buttons.add(new SidebarButton("Skills", "nav:skills:professions", null, "#4ecdc4"));
+        }
+        if (isModuleAvailable("recruitment")) {
+            String recruitBadge = recruitmentRenderer != null ? recruitmentRenderer.getBidBadge() : null;
+            buttons.add(new SidebarButton("Recruitment", "nav:recruitment:rank", recruitBadge, "#ffd700"));
         }
 
         // Always-available settings
@@ -181,6 +187,7 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
             case "classes" -> "#8b4513";
             case "character" -> "#d4af37";
             case "skills" -> "#4ecdc4";
+            case "recruitment" -> "#ffd700";
             case "settings" -> "#6c7a89";
             default -> "#ffffff";
         };
@@ -194,12 +201,12 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
             case "classes" -> "CLASSES";
             case "character" -> "CHARACTER";
             case "skills" -> "SKILLS";
+            case "recruitment" -> "RECRUITMENT";
             case "settings" -> "SETTINGS";
             default -> "PANEL";
         };
 
-        cmd.set("#HeaderTitle.Text", headerTitle);
-        cmd.set("#HeaderTitle.Style.TextColor", headerColor);
+        cmd.set("#HeaderTitle.TextSpans", Message.raw(headerTitle).color(Color.decode(headerColor)));
         cmd.set("#HeaderSubtitle.Text", getPlayerSubtitle());
 
         // Build sidebar based on module
@@ -212,6 +219,7 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
             case "classes" -> classesRenderer.getSidebarButtons(view);
             case "character" -> characterRenderer.getSidebarButtons(view);
             case "skills" -> skillsRenderer.getSidebarButtons(view);
+            case "recruitment" -> recruitmentRenderer.getSidebarButtons(view);
             case "settings" -> settingsRenderer.getSidebarButtons(view);
             default -> new ArrayList<>();
         };
@@ -240,6 +248,7 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
             case "classes" -> classesRenderer.renderContent(cmd, events, store, playerRef, view);
             case "character" -> characterRenderer.renderContent(cmd, events, store, playerRef, view);
             case "skills" -> skillsRenderer.renderContent(cmd, events, view);
+            case "recruitment" -> recruitmentRenderer.renderContent(cmd, events, view);
             case "settings" -> settingsRenderer.renderContent(cmd, events, view);
         }
     }
@@ -282,8 +291,7 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
      */
     private void renderWelcomeContent(UICommandBuilder cmd) {
         // Header
-        cmd.set("#HeaderSubtitle.Text", "Welcome, " + playerRef.getUsername());
-        cmd.set("#HeaderSubtitle.Style.TextColor", "#d4af37");
+        cmd.set("#HeaderSubtitle.TextSpans", Message.raw("Welcome, " + playerRef.getUsername()).color(Color.decode("#d4af37")));
         cmd.set("#HeaderInfo.Text", "Select a module from the sidebar");
 
         // Content
@@ -349,6 +357,16 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
             return;
         }
 
+        // Handle opening standalone guild page
+        if ("open:guild".equals(data.action)) {
+            PlayerRef pr = store.getComponent(ref, PlayerRef.getComponentType());
+            if (pr != null) {
+                player.getPageManager().openCustomPage(ref, store,
+                    new FactionMenuGui(HC_FactionsPlugin.getInstance(), pr));
+            }
+            return;
+        }
+
         // Handle navigation (nav:module or nav:module:view)
         if (data.action.startsWith("nav:")) {
             String newPath = data.action.substring(4);
@@ -393,6 +411,8 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
             case "browser_search" -> handleBrowserSearch(ref, store, player);
             case "talent" -> handleTalentAction(ref, store, player, actionParam);
             case "setting" -> handleSettingToggle(ref, store, player, actionParam);
+            case "recruit_accept", "recruit_decline", "recruit_withdraw", "recruit_bid" ->
+                handleRecruitmentAction(ref, store, player, actionType, actionParam);
         }
     }
 
@@ -464,6 +484,35 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
             new UnifiedPanelGui(plugin, playerRef, currentPath, previousPath));
     }
 
+    private void handleRecruitmentAction(Ref<EntityStore> ref, Store<EntityStore> store, Player player,
+                                          String actionType, String actionParam) {
+        if (recruitmentRenderer == null) return;
+
+        String error = switch (actionType) {
+            case "recruit_accept" -> recruitmentRenderer.handleAcceptBid(actionParam);
+            case "recruit_decline" -> recruitmentRenderer.handleDeclineBid(actionParam);
+            case "recruit_withdraw" -> {
+                // actionParam is "guildId:playerUuid"
+                String[] parts = actionParam.split(":", 2);
+                if (parts.length < 2) yield "Invalid withdraw parameters.";
+                yield recruitmentRenderer.handleWithdrawBid(parts[0], parts[1]);
+            }
+            case "recruit_bid" -> {
+                // Quick bid with default 100 gold amount
+                yield recruitmentRenderer.handlePlaceBid(actionParam, "100");
+            }
+            default -> null;
+        };
+
+        if (error != null) {
+            playerRef.sendMessage(com.hypixel.hytale.server.core.Message.raw(error).color("red"));
+        }
+
+        // Refresh the page
+        player.getPageManager().openCustomPage(ref, store,
+            new UnifiedPanelGui(plugin, playerRef, currentPath, previousPath));
+    }
+
     private boolean isModuleAvailable(String module) {
         return switch (module) {
             case "factions" -> HC_FactionsPlugin.getInstance() != null;
@@ -472,6 +521,7 @@ public class UnifiedPanelGui extends InteractiveCustomUIPage<UnifiedPanelGui.Pan
             case "classes" -> isPluginLoaded("com.hcclasses.HC_ClassesPlugin");
             case "character" -> isPluginLoaded("com.hcattributes.HC_AttributesPlugin") || isPluginLoaded("com.hcclasses.HC_ClassesPlugin");
             case "skills" -> isPluginLoaded("com.hcprofessions.HC_ProfessionsPlugin");
+            case "recruitment" -> isPluginLoaded("com.hcrecruitment.HC_RecruitmentPlugin");
             default -> false;
         };
     }

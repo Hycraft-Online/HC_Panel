@@ -1,341 +1,607 @@
-// HC_Panel Main Menu - Unified Character Panel
-// Sidebar layout with module navigation
+// HC_Panel Main Menu — Hytown-inspired layout
+// Left sidebar: avatar, username, stats
+// Right area: 3x3 tile grid for modules
+$C = "../Common.ui";
 
-// Colors
-@BgDark = #0a1119(0.95);
-@BgLight = #141c26(0.98);
-@BgCard = #1b2532(0.5);
-@TextPrimary = #ffffff;
-@TextSecondary = #96a9be;
-@TextGold = #d4af37;
-@Border = #2b3542;
-@BadgeBg = #e74c3c;
+// ─── Color Tokens ───
+@BgSurface = #0b1220(0.94);
+@BgSurfaceMuted = #0f172a(0.55);
+@BgSurfaceStrong = #0f172a(0.85);
+@ColorOutline = #ffffff(0.12);
+@ColorOutlineStrong = #334155(0.6);
+@ColorAccent = #22d3ee;
+@ColorText = #e2e8f0;
+@ColorTextMuted = #94a3b8;
+@ColorTextBright = #ffffff;
+@ColorGold = $C.@ColorGoldHighlight;
+@ColorDivider = #93844C;
 
-// Menu Button Style
-@MenuButtonStyle = TextButtonStyle(
-  Default: (Background: #000000(0), LabelStyle: (FontSize: 14, TextColor: #96a9be, RenderBold: true, VerticalAlignment: Center)),
-  Hovered: (Background: #1b2532, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center)),
-  Pressed: (Background: #0e151e, LabelStyle: (FontSize: 14, TextColor: #96a9be, RenderBold: true, VerticalAlignment: Center)),
+// ─── Typography ───
+@TitleStyle = LabelStyle(
+  FontSize: 20,
+  TextColor: @ColorText,
+  RenderBold: true,
+  RenderUppercase: true,
+  HorizontalAlignment: Center
 );
 
-// Primary Button (BACK)
-@PrimaryButtonStyle = TextButtonStyle(
-  Default: (Background: #3a7bd5, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Hovered: (Background: #4a8be5, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Pressed: (Background: #2a6bc5, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+@StatLabelStyle = LabelStyle(
+  FontSize: 12,
+  TextColor: @ColorTextMuted,
+  HorizontalAlignment: Start,
+  VerticalAlignment: Center
 );
 
-// Danger Button (CLOSE)
-@DangerButtonStyle = TextButtonStyle(
-  Default: (Background: #8b3a3a, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Hovered: (Background: #9b4a4a, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Pressed: (Background: #7b2a2a, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
+@StatValueStyle = LabelStyle(
+  FontSize: 12,
+  TextColor: @ColorText,
+  RenderBold: true,
+  HorizontalAlignment: End,
+  VerticalAlignment: Center
 );
 
-// Page overlay background
+// ─── Tile Button Style ───
+@TileDefaultBg = #0b1220(0.94);
+@TileHoverBorder = $C.@ColorGoldHighlight;
+
+// ─── Page Root ───
 Group {
-  Background: #000000(0.5);
+  Anchor: (Full: 0);
+
+  SceneBlur {
+    Anchor: (Full: 0);
+    Background: #000000(0.45);
+  }
 
   Group {
-    Anchor: (Width: 800, Height: 520);
-    LayoutMode: Left;
+    LayoutMode: Center;
+    Anchor: (Full: 0);
 
-    // ===== LEFT PANEL (Sidebar) =====
-    Group #LeftPanel {
-      Anchor: (Width: 180);
-      Background: @BgDark;
-      LayoutMode: Top;
-      Padding: (Full: 16);
+    $C.@DecoratedContainer #MainMenuPanel {
+      Anchor: (Width: 1020, Height: 580);
 
-      // Header
-      Label #SidebarHeader {
-        Text: "MENU";
-        Anchor: (Height: 28);
-        Style: (FontSize: 12, TextColor: @TextGold, RenderBold: true, LetterSpacing: 3);
-      }
+      #Title {
+        Group {
+          LayoutMode: Center;
+          Anchor: (Full: 0);
 
-      Group { Anchor: (Height: 16); }
-
-      // Module buttons (5 slots max)
-      Group #ModuleRow0 {
-        Anchor: (Height: 38);
-        LayoutMode: Left;
-
-        TextButton #ModuleButton0 {
-          Text: "Factions";
-          FlexWeight: 1;
-          Style: @MenuButtonStyle;
-        }
-
-        Group #ModuleBadge0 {
-          Anchor: (Width: 24, Height: 24);
-          Background: @BadgeBg;
-          Visible: false;
-
-          Label #ModuleBadge0Text {
-            Text: "0";
-            Style: (FontSize: 11, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+          Label {
+            Text: "HYCRAFT";
+            Anchor: (Left: 0, Right: 0, Height: 26);
+            Style: @TitleStyle;
           }
         }
       }
 
-      Group #ModuleRow1 {
-        Anchor: (Height: 38);
-        LayoutMode: Left;
-
-        TextButton #ModuleButton1 {
-          Text: "Honor";
+      #Content {
+        Group #MainRow {
           FlexWeight: 1;
-          Style: @MenuButtonStyle;
-        }
-
-        Group #ModuleBadge1 {
-          Anchor: (Width: 24, Height: 24);
-          Background: @BadgeBg;
-          Visible: false;
-
-          Label #ModuleBadge1Text {
-            Text: "0";
-            Style: (FontSize: 11, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
-          }
-        }
-      }
-
-      Group #ModuleRow2 {
-        Anchor: (Height: 38);
-        LayoutMode: Left;
-
-        TextButton #ModuleButton2 {
-          Text: "Attributes";
-          FlexWeight: 1;
-          Style: @MenuButtonStyle;
-        }
-
-        Group #ModuleBadge2 {
-          Anchor: (Width: 24, Height: 24);
-          Background: @BadgeBg;
-          Visible: false;
-
-          Label #ModuleBadge2Text {
-            Text: "0";
-            Style: (FontSize: 11, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
-          }
-        }
-      }
-
-      Group #ModuleRow3 {
-        Anchor: (Height: 38);
-        LayoutMode: Left;
-        Visible: false;
-
-        TextButton #ModuleButton3 {
-          Text: "Module 4";
-          FlexWeight: 1;
-          Style: @MenuButtonStyle;
-        }
-
-        Group #ModuleBadge3 {
-          Anchor: (Width: 24, Height: 24);
-          Background: @BadgeBg;
-          Visible: false;
-
-          Label #ModuleBadge3Text {
-            Text: "0";
-            Style: (FontSize: 11, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
-          }
-        }
-      }
-
-      Group #ModuleRow4 {
-        Anchor: (Height: 38);
-        LayoutMode: Left;
-        Visible: false;
-
-        TextButton #ModuleButton4 {
-          Text: "Module 5";
-          FlexWeight: 1;
-          Style: @MenuButtonStyle;
-        }
-
-        Group #ModuleBadge4 {
-          Anchor: (Width: 24, Height: 24);
-          Background: @BadgeBg;
-          Visible: false;
-
-          Label #ModuleBadge4Text {
-            Text: "0";
-            Style: (FontSize: 11, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
-          }
-        }
-      }
-
-      // Spacer
-      Group { FlexWeight: 1; }
-
-      // BACK button (hidden in main menu)
-      TextButton #BackButton {
-        Text: "BACK";
-        Anchor: (Height: 38);
-        Style: @PrimaryButtonStyle;
-        Visible: false;
-      }
-
-      // CLOSE button
-      TextButton #CloseButton {
-        Text: "CLOSE";
-        Anchor: (Height: 38);
-        Style: @DangerButtonStyle;
-      }
-    }
-
-    // ===== RIGHT PANEL (Content) =====
-    Group #RightPanel {
-      FlexWeight: 1;
-      Background: @BgLight;
-      LayoutMode: Top;
-      Padding: (Full: 20);
-
-      // Header Section
-      Group #HeaderSection {
-        Anchor: (Height: 60);
-        LayoutMode: Top;
-
-        Label #HeaderTitle {
-          Text: "CHARACTER PANEL";
-          Anchor: (Height: 32);
-          Style: (FontSize: 22, TextColor: @TextGold, RenderBold: true, LetterSpacing: 2);
-        }
-
-        Label #HeaderSubtitle {
-          Text: "Welcome, Player";
-          Anchor: (Height: 20);
-          Style: (FontSize: 14, TextColor: @TextSecondary);
-        }
-      }
-
-      Group { Anchor: (Height: 1); Background: @Border; }
-      Group { Anchor: (Height: 16); }
-
-      // Welcome Content (shown in main menu)
-      Group #WelcomeContent {
-        FlexWeight: 1;
-        LayoutMode: Top;
-        Background: @BgCard;
-        Padding: (Full: 20);
-
-        Label {
-          Text: "WELCOME";
-          Anchor: (Height: 24);
-          Style: (FontSize: 11, TextColor: @TextSecondary, RenderBold: true, LetterSpacing: 2);
-        }
-
-        Group { Anchor: (Height: 12); }
-
-        Label #WelcomeText {
-          Text: "Use the sidebar to navigate between modules.";
-          Style: (FontSize: 14, TextColor: @TextPrimary, Wrap: true);
-        }
-
-        Group { FlexWeight: 1; }
-
-        // Quick stats row (optional future enhancement)
-        Group #QuickStatsRow {
-          Anchor: (Height: 80);
           LayoutMode: Left;
-          Visible: false;
 
-          Group {
-            FlexWeight: 1;
+          // ─── Left Player Sidebar ───
+          Group #PlayerSidebar {
+            Anchor: (Width: 190, Top: 0, Bottom: 0);
             LayoutMode: Top;
-            Background: #0a1119(0.5);
-            Padding: (Full: 10);
+            Padding: (Horizontal: 16, Top: 20, Bottom: 16);
 
-            Label {
-              Text: "LEVEL";
-              Anchor: (Height: 14);
-              Style: (FontSize: 9, TextColor: @TextSecondary, RenderBold: true, LetterSpacing: 1);
+            // Avatar placeholder — initials shown via label
+            Group #AvatarFrame {
+              Anchor: (Width: 80, Height: 80);
+              Background: @BgSurfaceStrong;
+              OutlineColor: @ColorOutlineStrong;
+              OutlineSize: 2;
+              LayoutMode: Center;
+
+              Label #AvatarInitial {
+                Text: "?";
+                Anchor: (Width: 80, Height: 80);
+                Style: (FontSize: 32, TextColor: @ColorAccent, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+              }
             }
 
-            Label #QuickLevel {
-              Text: "1";
-              Anchor: (Height: 28);
-              Style: (FontSize: 22, TextColor: #4FC3F7, RenderBold: true);
+            Group { Anchor: (Height: 12); }
+
+            // Player name
+            Label #UsernameLabel {
+              Text: "Player";
+              Anchor: (Left: 0, Right: 0, Height: 22);
+              Style: (FontSize: 16, TextColor: @ColorTextBright, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+            }
+
+            // Subtitle (class / faction)
+            Label #SubtitleLabel {
+              Text: "";
+              Anchor: (Left: 0, Right: 0, Height: 18);
+              Style: (FontSize: 12, TextColor: @ColorTextMuted, HorizontalAlignment: Center, VerticalAlignment: Center);
+            }
+
+            Group { Anchor: (Height: 10); }
+
+            // Separator
+            Group {
+              Anchor: (Left: 0, Right: 0, Height: 1);
+              Background: @ColorOutline;
+            }
+
+            Group { Anchor: (Height: 12); }
+
+            // Level
+            Group {
+              LayoutMode: Left;
+              Anchor: (Left: 0, Right: 0, Height: 18);
+
+              Label {
+                Text: "Level";
+                Style: @StatLabelStyle;
+                FlexWeight: 1;
+              }
+              Label #LevelValue {
+                Text: "...";
+                Style: (FontSize: 12, TextColor: @ColorAccent, RenderBold: true, HorizontalAlignment: End, VerticalAlignment: Center);
+                Anchor: (Width: 60, Height: 18);
+              }
+            }
+
+            Group { Anchor: (Height: 6); }
+
+            // Class
+            Group {
+              LayoutMode: Left;
+              Anchor: (Left: 0, Right: 0, Height: 18);
+
+              Label {
+                Text: "Class";
+                Style: @StatLabelStyle;
+                FlexWeight: 1;
+              }
+              Label #ClassValue {
+                Text: "...";
+                Style: @StatValueStyle;
+                Anchor: (Width: 80, Height: 18);
+              }
+            }
+
+            Group { Anchor: (Height: 6); }
+
+            // Faction
+            Group {
+              LayoutMode: Left;
+              Anchor: (Left: 0, Right: 0, Height: 18);
+
+              Label {
+                Text: "Faction";
+                Style: @StatLabelStyle;
+                FlexWeight: 1;
+              }
+              Label #FactionValue {
+                Text: "...";
+                Style: @StatValueStyle;
+                Anchor: (Width: 80, Height: 18);
+              }
+            }
+
+            Group { Anchor: (Height: 6); }
+
+            // Guild
+            Group {
+              LayoutMode: Left;
+              Anchor: (Left: 0, Right: 0, Height: 18);
+
+              Label {
+                Text: "Guild";
+                Style: @StatLabelStyle;
+                FlexWeight: 1;
+              }
+              Label #GuildValue {
+                Text: "...";
+                Style: @StatValueStyle;
+                Anchor: (Width: 80, Height: 18);
+              }
+            }
+
+            // Spacer
+            Group { FlexWeight: 1; }
+
+            // Bottom separator
+            Group {
+              Anchor: (Left: 0, Right: 0, Height: 1);
+              Background: @ColorOutline;
+            }
+
+            Group { Anchor: (Height: 10); }
+
+            // Online count
+            Group {
+              LayoutMode: Left;
+              Anchor: (Left: 0, Right: 0, Height: 18);
+
+              Label {
+                Text: "Online";
+                Style: @StatLabelStyle;
+                FlexWeight: 1;
+              }
+              Label #OnlineValue {
+                Text: "0";
+                Style: @StatValueStyle;
+                Anchor: (Width: 60, Height: 18);
+              }
+            }
+
+            Group { Anchor: (Height: 10); }
+
+            // Discord
+            Group {
+              Anchor: (Left: 0, Right: 0, Height: 1);
+              Background: @ColorOutline;
+            }
+
+            Group { Anchor: (Height: 10); }
+
+            Label #DiscordLabel {
+              Text: "discord.gg/hycraft";
+              Anchor: (Left: 0, Right: 0, Height: 20);
+              Style: (FontSize: 12, TextColor: #5865F2, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
             }
           }
 
-          Group { Anchor: (Width: 8); }
-
+          // Vertical divider
           Group {
-            FlexWeight: 1;
-            LayoutMode: Top;
-            Background: #0a1119(0.5);
-            Padding: (Full: 10);
-
-            Label {
-              Text: "HONOR RANK";
-              Anchor: (Height: 14);
-              Style: (FontSize: 9, TextColor: @TextSecondary, RenderBold: true, LetterSpacing: 1);
-            }
-
-            Label #QuickHonorRank {
-              Text: "Unranked";
-              Anchor: (Height: 28);
-              Style: (FontSize: 16, TextColor: @TextGold, RenderBold: true);
-            }
+            Anchor: (Width: 1, Top: 0, Bottom: 0);
+            Background: #ffffff(0.15);
           }
 
-          Group { Anchor: (Width: 8); }
-
-          Group {
+          // ─── Right Tile Grid ───
+          Group #TileArea {
             FlexWeight: 1;
             LayoutMode: Top;
-            Background: #0a1119(0.5);
-            Padding: (Full: 10);
+            Padding: (Horizontal: 20, Top: 16, Bottom: 16);
 
-            Label {
-              Text: "GUILD";
-              Anchor: (Height: 14);
-              Style: (FontSize: 9, TextColor: @TextSecondary, RenderBold: true, LetterSpacing: 1);
+            Group #TileGrid {
+              Anchor: (Left: 0, Right: 0);
+              LayoutMode: Top;
+
+              // Row 0
+              Group #TileRow0 {
+                LayoutMode: Left;
+                Anchor: (Left: 0, Right: 0, Height: 140);
+
+                Group #Slot0 {
+                  FlexWeight: 1;
+                  Button #TileBtn0 {
+                    Anchor: (Full: 0);
+                    LayoutMode: Full;
+                    Style: (
+                      Default:  (Background: @BgSurface),
+                      Hovered:  (Background: @TileHoverBorder),
+                      Pressed:  (Background: #b8862e),
+                      Disabled: (Background: #1a2030)
+                    );
+                    Group #TileInner0 {
+                      Anchor: (Full: 2);
+                      Background: @BgSurface;
+                      LayoutMode: Top;
+                      Padding: (Horizontal: 14, Vertical: 10);
+                      Group { Anchor: (Height: 6); }
+                      ItemIcon #TileIcon0 { Anchor: (Width: 28, Height: 28); }
+                      Group { Anchor: (Height: 8); }
+                      Label #TileTitle0 {
+                        Text: "Module";
+                        Anchor: (Left: 0, Right: 0, Height: 20);
+                        Style: (FontSize: 16, TextColor: $C.@ColorDefault, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+                      }
+                      Group { Anchor: (Height: 4); }
+                      Label #TileDesc0 {
+                        Text: "Description";
+                        Anchor: (Left: 0, Right: 0, Height: 30);
+                        Style: (FontSize: 12, TextColor: $C.@ColorDefaultLabel, HorizontalAlignment: Start, VerticalAlignment: Start, Wrap: true);
+                      }
+                    }
+                  }
+                }
+                Group { Anchor: (Width: 16); }
+                Group #Slot1 {
+                  FlexWeight: 1;
+                  Button #TileBtn1 {
+                    Anchor: (Full: 0);
+                    LayoutMode: Full;
+                    Style: (
+                      Default:  (Background: @BgSurface),
+                      Hovered:  (Background: @TileHoverBorder),
+                      Pressed:  (Background: #b8862e),
+                      Disabled: (Background: #1a2030)
+                    );
+                    Group #TileInner1 {
+                      Anchor: (Full: 2);
+                      Background: @BgSurface;
+                      LayoutMode: Top;
+                      Padding: (Horizontal: 14, Vertical: 10);
+                      Group { Anchor: (Height: 6); }
+                      ItemIcon #TileIcon1 { Anchor: (Width: 28, Height: 28); }
+                      Group { Anchor: (Height: 8); }
+                      Label #TileTitle1 {
+                        Text: "Module";
+                        Anchor: (Left: 0, Right: 0, Height: 20);
+                        Style: (FontSize: 16, TextColor: $C.@ColorDefault, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+                      }
+                      Group { Anchor: (Height: 4); }
+                      Label #TileDesc1 {
+                        Text: "Description";
+                        Anchor: (Left: 0, Right: 0, Height: 30);
+                        Style: (FontSize: 12, TextColor: $C.@ColorDefaultLabel, HorizontalAlignment: Start, VerticalAlignment: Start, Wrap: true);
+                      }
+                    }
+                  }
+                }
+                Group { Anchor: (Width: 16); }
+                Group #Slot2 {
+                  FlexWeight: 1;
+                  Button #TileBtn2 {
+                    Anchor: (Full: 0);
+                    LayoutMode: Full;
+                    Style: (
+                      Default:  (Background: @BgSurface),
+                      Hovered:  (Background: @TileHoverBorder),
+                      Pressed:  (Background: #b8862e),
+                      Disabled: (Background: #1a2030)
+                    );
+                    Group #TileInner2 {
+                      Anchor: (Full: 2);
+                      Background: @BgSurface;
+                      LayoutMode: Top;
+                      Padding: (Horizontal: 14, Vertical: 10);
+                      Group { Anchor: (Height: 6); }
+                      ItemIcon #TileIcon2 { Anchor: (Width: 28, Height: 28); }
+                      Group { Anchor: (Height: 8); }
+                      Label #TileTitle2 {
+                        Text: "Module";
+                        Anchor: (Left: 0, Right: 0, Height: 20);
+                        Style: (FontSize: 16, TextColor: $C.@ColorDefault, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+                      }
+                      Group { Anchor: (Height: 4); }
+                      Label #TileDesc2 {
+                        Text: "Description";
+                        Anchor: (Left: 0, Right: 0, Height: 30);
+                        Style: (FontSize: 12, TextColor: $C.@ColorDefaultLabel, HorizontalAlignment: Start, VerticalAlignment: Start, Wrap: true);
+                      }
+                    }
+                  }
+                }
+              }
+
+              Group { Anchor: (Height: 16); }
+
+              // Row 1
+              Group #TileRow1 {
+                LayoutMode: Left;
+                Anchor: (Left: 0, Right: 0, Height: 140);
+
+                Group #Slot3 {
+                  FlexWeight: 1;
+                  Button #TileBtn3 {
+                    Anchor: (Full: 0);
+                    LayoutMode: Full;
+                    Style: (
+                      Default:  (Background: @BgSurface),
+                      Hovered:  (Background: @TileHoverBorder),
+                      Pressed:  (Background: #b8862e),
+                      Disabled: (Background: #1a2030)
+                    );
+                    Group #TileInner3 {
+                      Anchor: (Full: 2);
+                      Background: @BgSurface;
+                      LayoutMode: Top;
+                      Padding: (Horizontal: 14, Vertical: 10);
+                      Group { Anchor: (Height: 6); }
+                      ItemIcon #TileIcon3 { Anchor: (Width: 28, Height: 28); }
+                      Group { Anchor: (Height: 8); }
+                      Label #TileTitle3 {
+                        Text: "Module";
+                        Anchor: (Left: 0, Right: 0, Height: 20);
+                        Style: (FontSize: 16, TextColor: $C.@ColorDefault, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+                      }
+                      Group { Anchor: (Height: 4); }
+                      Label #TileDesc3 {
+                        Text: "Description";
+                        Anchor: (Left: 0, Right: 0, Height: 30);
+                        Style: (FontSize: 12, TextColor: $C.@ColorDefaultLabel, HorizontalAlignment: Start, VerticalAlignment: Start, Wrap: true);
+                      }
+                    }
+                  }
+                }
+                Group { Anchor: (Width: 16); }
+                Group #Slot4 {
+                  FlexWeight: 1;
+                  Button #TileBtn4 {
+                    Anchor: (Full: 0);
+                    LayoutMode: Full;
+                    Style: (
+                      Default:  (Background: @BgSurface),
+                      Hovered:  (Background: @TileHoverBorder),
+                      Pressed:  (Background: #b8862e),
+                      Disabled: (Background: #1a2030)
+                    );
+                    Group #TileInner4 {
+                      Anchor: (Full: 2);
+                      Background: @BgSurface;
+                      LayoutMode: Top;
+                      Padding: (Horizontal: 14, Vertical: 10);
+                      Group { Anchor: (Height: 6); }
+                      ItemIcon #TileIcon4 { Anchor: (Width: 28, Height: 28); }
+                      Group { Anchor: (Height: 8); }
+                      Label #TileTitle4 {
+                        Text: "Module";
+                        Anchor: (Left: 0, Right: 0, Height: 20);
+                        Style: (FontSize: 16, TextColor: $C.@ColorDefault, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+                      }
+                      Group { Anchor: (Height: 4); }
+                      Label #TileDesc4 {
+                        Text: "Description";
+                        Anchor: (Left: 0, Right: 0, Height: 30);
+                        Style: (FontSize: 12, TextColor: $C.@ColorDefaultLabel, HorizontalAlignment: Start, VerticalAlignment: Start, Wrap: true);
+                      }
+                    }
+                  }
+                }
+                Group { Anchor: (Width: 16); }
+                Group #Slot5 {
+                  FlexWeight: 1;
+                  Button #TileBtn5 {
+                    Anchor: (Full: 0);
+                    LayoutMode: Full;
+                    Style: (
+                      Default:  (Background: @BgSurface),
+                      Hovered:  (Background: @TileHoverBorder),
+                      Pressed:  (Background: #b8862e),
+                      Disabled: (Background: #1a2030)
+                    );
+                    Group #TileInner5 {
+                      Anchor: (Full: 2);
+                      Background: @BgSurface;
+                      LayoutMode: Top;
+                      Padding: (Horizontal: 14, Vertical: 10);
+                      Group { Anchor: (Height: 6); }
+                      ItemIcon #TileIcon5 { Anchor: (Width: 28, Height: 28); }
+                      Group { Anchor: (Height: 8); }
+                      Label #TileTitle5 {
+                        Text: "Module";
+                        Anchor: (Left: 0, Right: 0, Height: 20);
+                        Style: (FontSize: 16, TextColor: $C.@ColorDefault, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+                      }
+                      Group { Anchor: (Height: 4); }
+                      Label #TileDesc5 {
+                        Text: "Description";
+                        Anchor: (Left: 0, Right: 0, Height: 30);
+                        Style: (FontSize: 12, TextColor: $C.@ColorDefaultLabel, HorizontalAlignment: Start, VerticalAlignment: Start, Wrap: true);
+                      }
+                    }
+                  }
+                }
+              }
+
+              Group { Anchor: (Height: 16); }
+
+              // Row 2
+              Group #TileRow2 {
+                LayoutMode: Left;
+                Anchor: (Left: 0, Right: 0, Height: 140);
+
+                Group #Slot6 {
+                  FlexWeight: 1;
+                  Button #TileBtn6 {
+                    Anchor: (Full: 0);
+                    LayoutMode: Full;
+                    Style: (
+                      Default:  (Background: @BgSurface),
+                      Hovered:  (Background: @TileHoverBorder),
+                      Pressed:  (Background: #b8862e),
+                      Disabled: (Background: #1a2030)
+                    );
+                    Group #TileInner6 {
+                      Anchor: (Full: 2);
+                      Background: @BgSurface;
+                      LayoutMode: Top;
+                      Padding: (Horizontal: 14, Vertical: 10);
+                      Group { Anchor: (Height: 6); }
+                      ItemIcon #TileIcon6 { Anchor: (Width: 28, Height: 28); }
+                      Group { Anchor: (Height: 8); }
+                      Label #TileTitle6 {
+                        Text: "Module";
+                        Anchor: (Left: 0, Right: 0, Height: 20);
+                        Style: (FontSize: 16, TextColor: $C.@ColorDefault, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+                      }
+                      Group { Anchor: (Height: 4); }
+                      Label #TileDesc6 {
+                        Text: "Description";
+                        Anchor: (Left: 0, Right: 0, Height: 30);
+                        Style: (FontSize: 12, TextColor: $C.@ColorDefaultLabel, HorizontalAlignment: Start, VerticalAlignment: Start, Wrap: true);
+                      }
+                    }
+                  }
+                }
+                Group { Anchor: (Width: 16); }
+                Group #Slot7 {
+                  FlexWeight: 1;
+                  Button #TileBtn7 {
+                    Anchor: (Full: 0);
+                    LayoutMode: Full;
+                    Style: (
+                      Default:  (Background: @BgSurface),
+                      Hovered:  (Background: @TileHoverBorder),
+                      Pressed:  (Background: #b8862e),
+                      Disabled: (Background: #1a2030)
+                    );
+                    Group #TileInner7 {
+                      Anchor: (Full: 2);
+                      Background: @BgSurface;
+                      LayoutMode: Top;
+                      Padding: (Horizontal: 14, Vertical: 10);
+                      Group { Anchor: (Height: 6); }
+                      ItemIcon #TileIcon7 { Anchor: (Width: 28, Height: 28); }
+                      Group { Anchor: (Height: 8); }
+                      Label #TileTitle7 {
+                        Text: "Module";
+                        Anchor: (Left: 0, Right: 0, Height: 20);
+                        Style: (FontSize: 16, TextColor: $C.@ColorDefault, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+                      }
+                      Group { Anchor: (Height: 4); }
+                      Label #TileDesc7 {
+                        Text: "Description";
+                        Anchor: (Left: 0, Right: 0, Height: 30);
+                        Style: (FontSize: 12, TextColor: $C.@ColorDefaultLabel, HorizontalAlignment: Start, VerticalAlignment: Start, Wrap: true);
+                      }
+                    }
+                  }
+                }
+                Group { Anchor: (Width: 16); }
+                Group #Slot8 {
+                  FlexWeight: 1;
+                  Button #TileBtn8 {
+                    Anchor: (Full: 0);
+                    LayoutMode: Full;
+                    Style: (
+                      Default:  (Background: @BgSurface),
+                      Hovered:  (Background: @TileHoverBorder),
+                      Pressed:  (Background: #b8862e),
+                      Disabled: (Background: #1a2030)
+                    );
+                    Group #TileInner8 {
+                      Anchor: (Full: 2);
+                      Background: @BgSurface;
+                      LayoutMode: Top;
+                      Padding: (Horizontal: 14, Vertical: 10);
+                      Group { Anchor: (Height: 6); }
+                      ItemIcon #TileIcon8 { Anchor: (Width: 28, Height: 28); }
+                      Group { Anchor: (Height: 8); }
+                      Label #TileTitle8 {
+                        Text: "Module";
+                        Anchor: (Left: 0, Right: 0, Height: 20);
+                        Style: (FontSize: 16, TextColor: $C.@ColorDefault, RenderBold: true, HorizontalAlignment: Start, VerticalAlignment: Center);
+                      }
+                      Group { Anchor: (Height: 4); }
+                      Label #TileDesc8 {
+                        Text: "Description";
+                        Anchor: (Left: 0, Right: 0, Height: 30);
+                        Style: (FontSize: 12, TextColor: $C.@ColorDefaultLabel, HorizontalAlignment: Start, VerticalAlignment: Start, Wrap: true);
+                      }
+                    }
+                  }
+                }
+              }
             }
 
-            Label #QuickGuild {
-              Text: "None";
-              Anchor: (Height: 28);
-              Style: (FontSize: 16, TextColor: #81C784, RenderBold: true);
+            // Footer
+            Group #Footer {
+              Padding: (Top: 10);
+              Anchor: (Left: 0, Right: 0, Height: 20);
+              LayoutMode: Center;
+
+              Label #FooterText {
+                Text: "Press ESC to close";
+                Style: (FontSize: 13, TextColor: @ColorTextMuted, HorizontalAlignment: Center, VerticalAlignment: Center);
+              }
             }
           }
         }
-      }
-
-      // Module Content placeholder (shown in module view)
-      Group #ModuleContent {
-        FlexWeight: 1;
-        LayoutMode: Top;
-        Background: @BgCard;
-        Padding: (Full: 20);
-        Visible: false;
-
-        Label {
-          Text: "MODULE VIEW";
-          Anchor: (Height: 24);
-          Style: (FontSize: 11, TextColor: @TextSecondary, RenderBold: true, LetterSpacing: 2);
-        }
-
-        Group { Anchor: (Height: 12); }
-
-        Label #ModuleContentText {
-          Text: "Select an option from the sidebar.";
-          Style: (FontSize: 14, TextColor: @TextPrimary, Wrap: true);
-        }
-      }
-
-      // Footer
-      Group { FlexWeight: 1; }
-
-      Label {
-        Text: "Press ESC or click CLOSE to exit";
-        Anchor: (Height: 16);
-        Style: (FontSize: 10, TextColor: #555555, HorizontalAlignment: Center);
       }
     }
   }

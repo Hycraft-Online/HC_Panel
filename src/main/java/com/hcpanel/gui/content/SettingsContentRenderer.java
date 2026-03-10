@@ -1,6 +1,7 @@
 package com.hcpanel.gui.content;
 
 import com.hcpanel.gui.UnifiedPanelGui.SidebarButton;
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -8,6 +9,7 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,8 +68,7 @@ public class SettingsContentRenderer {
         cmd.set("#SettingsToggle0Spacer.Visible", true);
         cmd.set("#SettingsToggle0Accent.Background", accentColor);
         cmd.set("#SettingsToggle0Title.Text", "SCROLLING BATTLE TEXT");
-        cmd.set("#SettingsToggle0Status.Text", "Status: " + statusText);
-        cmd.set("#SettingsToggle0Status.Style.TextColor", statusColor);
+        cmd.set("#SettingsToggle0Status.TextSpans", Message.raw("Status: " + statusText).color(Color.decode(statusColor)));
         cmd.set("#SettingsToggle0Btn.Text", btnText);
 
         // Bind the toggle button

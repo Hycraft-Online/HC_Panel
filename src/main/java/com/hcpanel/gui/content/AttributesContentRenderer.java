@@ -20,6 +20,9 @@ import com.hcattributes.models.AttributeSnapshot;
 import com.hcfactions.HC_FactionsPlugin;
 import com.hcfactions.models.PlayerData;
 
+import com.hypixel.hytale.server.core.Message;
+
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -124,8 +127,7 @@ public class AttributesContentRenderer {
             if (factionsPlugin != null) {
                 var faction = factionsPlugin.getFactionManager().getFaction(factionId);
                 if (faction != null) {
-                    cmd.set("#AttrFactionTag.Text", "[" + faction.getShortName() + "]");
-                    cmd.set("#AttrFactionTag.Style.TextColor", faction.getColorHex());
+                    cmd.set("#AttrFactionTag.TextSpans", Message.raw("[" + faction.getShortName() + "]").color(Color.decode(faction.getColorHex())));
                 }
             }
         }
@@ -250,8 +252,7 @@ public class AttributesContentRenderer {
             if (factionsPlugin != null) {
                 var faction = factionsPlugin.getFactionManager().getFaction(factionId);
                 if (faction != null) {
-                    cmd.set("#AttrFactionTag.Text", "[" + faction.getShortName() + "]");
-                    cmd.set("#AttrFactionTag.Style.TextColor", faction.getColorHex());
+                    cmd.set("#AttrFactionTag.TextSpans", Message.raw("[" + faction.getShortName() + "]").color(Color.decode(faction.getColorHex())));
                 }
             }
         }

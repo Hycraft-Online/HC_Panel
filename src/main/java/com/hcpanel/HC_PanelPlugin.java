@@ -6,9 +6,11 @@ import com.hcpanel.database.DatabaseConfig;
 import com.hcpanel.database.DatabaseManager;
 import com.hcpanel.database.NewsRepository;
 import com.hcpanel.gui.modules.CharacterModule;
+import com.hcpanel.gui.modules.CharactersModule;
 import com.hcpanel.gui.modules.FactionsModule;
 import com.hcpanel.gui.modules.HonorModule;
 import com.hcpanel.gui.modules.ModuleContentProvider;
+import com.hcpanel.gui.modules.RecruitmentModule;
 import com.hcpanel.gui.modules.SkillsModule;
 
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -130,6 +132,18 @@ public class HC_PanelPlugin extends JavaPlugin {
         if (isPluginAvailable("com.hcprofessions.HC_ProfessionsPlugin")) {
             availableModules.add(new SkillsModule());
             this.getLogger().at(Level.INFO).log("Detected HC_Professions - Skills module enabled");
+        }
+
+        // Check for HC_Recruitment
+        if (isPluginAvailable("com.hcrecruitment.HC_RecruitmentPlugin")) {
+            availableModules.add(new RecruitmentModule());
+            this.getLogger().at(Level.INFO).log("Detected HC_Recruitment - Recruitment module enabled");
+        }
+
+        // Check for HC_MultiChar (character switching)
+        if (isPluginAvailable("com.hcmultichar.HC_MultiCharPlugin")) {
+            availableModules.add(new CharactersModule());
+            this.getLogger().at(Level.INFO).log("Detected HC_MultiChar - Characters module enabled");
         }
 
         if (availableModules.isEmpty()) {

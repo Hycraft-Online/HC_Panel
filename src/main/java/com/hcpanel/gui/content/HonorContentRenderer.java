@@ -13,6 +13,9 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hcfactions.HC_FactionsPlugin;
 import com.hcfactions.models.PlayerData;
 
+import com.hypixel.hytale.server.core.Message;
+
+import java.awt.Color;
 import java.lang.reflect.Method;
 import java.time.DayOfWeek;
 import java.time.Duration;
@@ -250,10 +253,8 @@ public class HonorContentRenderer {
         cmd.set("#HeaderSection.Visible", false);
         cmd.set("#HonorHeroSection.Visible", true);
         cmd.set("#HonorEmblemOuter.Background", tierColor);
-        cmd.set("#HonorRankNumber.Text", String.valueOf(rankNumber));
-        cmd.set("#HonorRankNumber.Style.TextColor", tierColor);
-        cmd.set("#HonorRankTitle.Text", rankTitle.toUpperCase());
-        cmd.set("#HonorRankTitle.Style.TextColor", tierColor);
+        cmd.set("#HonorRankNumber.TextSpans", Message.raw(String.valueOf(rankNumber)).color(Color.decode(tierColor)));
+        cmd.set("#HonorRankTitle.TextSpans", Message.raw(rankTitle.toUpperCase()).color(Color.decode(tierColor)));
         cmd.set("#HonorPlayerName.Text", playerRef.getUsername());
 
         if (factionId != null) {
@@ -261,8 +262,7 @@ public class HonorContentRenderer {
             if (factionsPlugin != null) {
                 var faction = factionsPlugin.getFactionManager().getFaction(factionId);
                 if (faction != null) {
-                    cmd.set("#HonorFactionTag.Text", "[" + faction.getShortName() + "]");
-                    cmd.set("#HonorFactionTag.Style.TextColor", faction.getColorHex());
+                    cmd.set("#HonorFactionTag.TextSpans", Message.raw("[" + faction.getShortName() + "]").color(Color.decode(faction.getColorHex())));
                 }
             }
         }
@@ -285,8 +285,7 @@ public class HonorContentRenderer {
         cmd.set("#HonorWeeklyCard.Visible", true);
         cmd.set("#HonorWeeklyCardSpacer.Visible", true);
         cmd.set("#HonorResetTimer.Text", getTimeUntilWeeklyReset());
-        cmd.set("#HonorBracketValue.Text", bracket > 0 ? String.valueOf(bracket) : "-");
-        cmd.set("#HonorBracketValue.Style.TextColor", bracket > 0 ? "#4aff7f" : "#555555");
+        cmd.set("#HonorBracketValue.TextSpans", Message.raw(bracket > 0 ? String.valueOf(bracket) : "-").color(Color.decode(bracket > 0 ? "#4aff7f" : "#555555")));
         cmd.set("#HonorBracketRP.Text", bracket > 0 ? String.format("+%,d RP", bracketRP) : "+0 RP");
         cmd.set("#HonorWeeklyValue.Text", String.format("%,d", weeklyHonor));
         cmd.set("#HonorWeeklyKills.Text", String.valueOf(weeklyKills));
@@ -325,13 +324,11 @@ public class HonorContentRenderer {
         cmd.set("#HonorSpendableValue.Text", String.format("%,d", spendableHonor));
 
         if (nextRank != null) {
-            cmd.set("#HonorNextRankTitle.Text", invokeTitle(nextRank, factionId));
-            cmd.set("#HonorNextRankTitle.Style.TextColor", getRankTierColor(invokeRankNumber(nextRank)));
+            cmd.set("#HonorNextRankTitle.TextSpans", Message.raw(invokeTitle(nextRank, factionId)).color(Color.decode(getRankTierColor(invokeRankNumber(nextRank)))));
             int rpNeeded = nextRankRP - rankPoints;
             cmd.set("#HonorRPNeeded.Text", String.format("%,d RP needed", rpNeeded));
         } else {
-            cmd.set("#HonorNextRankTitle.Text", "MAX RANK");
-            cmd.set("#HonorNextRankTitle.Style.TextColor", "#ffd700");
+            cmd.set("#HonorNextRankTitle.TextSpans", Message.raw("MAX RANK").color(Color.decode("#ffd700")));
             cmd.set("#HonorRPNeeded.Text", "You've reached the top!");
         }
 
@@ -404,10 +401,9 @@ public class HonorContentRenderer {
             int bracketNum = i + 1;
             boolean isCurrentBracket = (bracketNum == playerBracket);
             cmd.set("#BracketRow" + i + ".Visible", true);
-            cmd.set("#BracketNum" + i + ".Text", String.valueOf(bracketNum));
             String numColor = bracketNum <= 3 ? "#ffd700" : "#c0c0c0";
             if (isCurrentBracket) numColor = "#4aff7f";
-            cmd.set("#BracketNum" + i + ".Style.TextColor", numColor);
+            cmd.set("#BracketNum" + i + ".TextSpans", Message.raw(String.valueOf(bracketNum)).color(Color.decode(numColor)));
             cmd.set("#BracketReq" + i + ".Text", String.format("%,d+ honor", brackets[i][0]));
             cmd.set("#BracketRP" + i + ".Text", String.format("+%,d RP", brackets[i][1]));
             if (isCurrentBracket) {
@@ -491,7 +487,7 @@ public class HonorContentRenderer {
             cmd.set("#LeaderRank" + index + ".Text", "#" + (index + 1));
             cmd.set("#LeaderName" + index + ".Text", name);
             if (name.equals(playerRef.getUsername())) {
-                cmd.set("#LeaderName" + index + ".Style.TextColor", "#4aff7f");
+                cmd.set("#LeaderName" + index + ".TextSpans", Message.raw(name).color(Color.decode("#4aff7f")));
                 cmd.set("#LeaderRow" + index + ".Background", "#1e3a2a");
             }
             cmd.set("#LeaderValue" + index + ".Text", String.format("%,d", value));
@@ -553,7 +549,7 @@ public class HonorContentRenderer {
             if (isCurrentRank) {
                 cmd.set("#RankYou" + i + ".Text", "< YOU");
                 cmd.set("#RankRow" + i + ".Background", "#1e3a2a");
-                cmd.set("#RankTitle" + i + ".Style.TextColor", "#4aff7f");
+                cmd.set("#RankTitle" + i + ".TextSpans", Message.raw(title).color(Color.decode("#4aff7f")));
             } else {
                 cmd.set("#RankYou" + i + ".Text", "");
             }

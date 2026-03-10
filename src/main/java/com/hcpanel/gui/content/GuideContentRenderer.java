@@ -1,12 +1,14 @@
 package com.hcpanel.gui.content;
 
 import com.hcpanel.gui.UnifiedPanelGui.SidebarButton;
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.ui.PatchStyle;
 import com.hypixel.hytale.server.core.ui.Value;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -153,7 +155,7 @@ public class GuideContentRenderer {
         // Set accent color
         if (accentColor != null) {
             cmd.set(prefix + "Accent.Background", accentColor);
-            cmd.set(prefix + "Icon.Style.TextColor", accentColor);
+            cmd.set(prefix + "Icon.TextSpans", Message.raw(icon).color(Color.decode(accentColor)));
         }
 
         // Show bullets if provided
@@ -178,7 +180,7 @@ public class GuideContentRenderer {
         cmd.set("#GuideStat" + index + "Value.Text", value);
         cmd.set("#GuideStat" + index + "Desc.Text", desc);
         if (valueColor != null) {
-            cmd.set("#GuideStat" + index + "Value.Style.TextColor", valueColor);
+            cmd.set("#GuideStat" + index + "Value.TextSpans", Message.raw(value).color(Color.decode(valueColor)));
         }
     }
 

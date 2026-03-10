@@ -1499,7 +1499,7 @@ Group {
 
               Group {
                 Anchor: (Width: 38, Height: 26);
-                Background: #c0392b;
+                Background: #FF6B6B;
                 LayoutMode: Top;
                 Padding: (Full: 2);
 
@@ -5460,6 +5460,659 @@ Group {
         } // End TalentTierScroll
       }
 
+
+      // ===== RECRUITMENT: MY RANK SECTION =====
+      Group #RecruitRankSection {
+        LayoutMode: Top;
+        Visible: false;
+        Padding: (Left: 10, Right: 10);
+
+        Group { Anchor: (Height: 10); }
+
+        // Rank emblem circle + title
+        Group {
+          LayoutMode: Left;
+          Anchor: (Height: 80);
+          Padding: (Left: 10);
+
+          // Rank emblem
+          Group #RecruitRankEmblemBg {
+            Anchor: (Width: 64, Height: 64);
+            Background: #333333;
+
+            Label #RecruitRankLetter {
+              Text: "?";
+              Style: (FontSize: 36, TextColor: #000000, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center);
+            }
+          }
+
+          Group { Anchor: (Width: 16); }
+
+          // Rank title + player name
+          Group {
+            FlexWeight: 1;
+            LayoutMode: Top;
+
+            Label #RecruitRankTitle {
+              Text: "UNRANKED";
+              Anchor: (Height: 30);
+              Style: (FontSize: 22, TextColor: #808080, RenderBold: true, LetterSpacing: 2, VerticalAlignment: Center);
+            }
+
+            Label #RecruitRankDesc {
+              Text: "";
+              Anchor: (Height: 24);
+              Style: (FontSize: 15, TextColor: #96a9be, VerticalAlignment: Center);
+            }
+          }
+        }
+
+        Group { Anchor: (Height: 1); Background: #2b3542; }
+        Group { Anchor: (Height: 8); }
+
+        // Stat rows (0-3)
+        Group #RecruitStatRow0 {
+          Anchor: (Height: 32);
+          LayoutMode: Left;
+          Padding: (Left: 16, Right: 16);
+          Visible: false;
+
+          Label #RecruitStatLabel0 {
+            Text: "";
+            Anchor: (Width: 180);
+            Style: (FontSize: 15, TextColor: #96a9be, VerticalAlignment: Center);
+          }
+
+          Label #RecruitStatValue0 {
+            Text: "";
+            FlexWeight: 1;
+            Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center);
+          }
+        }
+
+        Group #RecruitStatRow1 {
+          Anchor: (Height: 32);
+          LayoutMode: Left;
+          Padding: (Left: 16, Right: 16);
+          Visible: false;
+
+          Label #RecruitStatLabel1 {
+            Text: "";
+            Anchor: (Width: 180);
+            Style: (FontSize: 15, TextColor: #96a9be, VerticalAlignment: Center);
+          }
+
+          Label #RecruitStatValue1 {
+            Text: "";
+            FlexWeight: 1;
+            Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center);
+          }
+        }
+
+        Group #RecruitStatRow2 {
+          Anchor: (Height: 32);
+          LayoutMode: Left;
+          Padding: (Left: 16, Right: 16);
+          Visible: false;
+
+          Label #RecruitStatLabel2 {
+            Text: "";
+            Anchor: (Width: 180);
+            Style: (FontSize: 15, TextColor: #96a9be, VerticalAlignment: Center);
+          }
+
+          Label #RecruitStatValue2 {
+            Text: "";
+            FlexWeight: 1;
+            Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center);
+          }
+        }
+
+        Group #RecruitStatRow3 {
+          Anchor: (Height: 32);
+          LayoutMode: Left;
+          Padding: (Left: 16, Right: 16);
+          Visible: false;
+
+          Label #RecruitStatLabel3 {
+            Text: "";
+            Anchor: (Width: 180);
+            Style: (FontSize: 15, TextColor: #96a9be, VerticalAlignment: Center);
+          }
+
+          Label #RecruitStatValue3 {
+            Text: "";
+            FlexWeight: 1;
+            Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center);
+          }
+        }
+
+        Group { Anchor: (Height: 8); }
+        Group { Anchor: (Height: 1); Background: #2b3542; }
+        Group { Anchor: (Height: 8); }
+
+        // Tier legend
+        Group #RecruitTierLegend {
+          LayoutMode: Top;
+          Visible: false;
+          Padding: (Left: 16, Right: 16);
+
+          Label {
+            Text: "RANK TIERS";
+            Anchor: (Height: 24);
+            Style: (FontSize: 14, TextColor: #96a9be, RenderBold: true, LetterSpacing: 1);
+          }
+
+          Group {
+            Anchor: (Height: 22);
+            LayoutMode: Left;
+
+            Label { Text: "S"; Anchor: (Width: 30); Style: (FontSize: 14, TextColor: #ffd700, RenderBold: true, VerticalAlignment: Center); }
+            Label { Text: "Boss defeated"; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+          }
+
+          Group {
+            Anchor: (Height: 22);
+            LayoutMode: Left;
+
+            Label { Text: "A"; Anchor: (Width: 30); Style: (FontSize: 14, TextColor: #ff5555, RenderBold: true, VerticalAlignment: Center); }
+            Label { Text: "80%+ damage"; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+          }
+
+          Group {
+            Anchor: (Height: 22);
+            LayoutMode: Left;
+
+            Label { Text: "B"; Anchor: (Width: 30); Style: (FontSize: 14, TextColor: #aa55ff, RenderBold: true, VerticalAlignment: Center); }
+            Label { Text: "50-80% damage"; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+          }
+
+          Group {
+            Anchor: (Height: 22);
+            LayoutMode: Left;
+
+            Label { Text: "C"; Anchor: (Width: 30); Style: (FontSize: 14, TextColor: #55aaff, RenderBold: true, VerticalAlignment: Center); }
+            Label { Text: "20-50% damage"; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+          }
+
+          Group {
+            Anchor: (Height: 22);
+            LayoutMode: Left;
+
+            Label { Text: "D"; Anchor: (Width: 30); Style: (FontSize: 14, TextColor: #aaaaaa, RenderBold: true, VerticalAlignment: Center); }
+            Label { Text: "Under 20% damage"; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+          }
+        }
+      }
+
+      // ===== RECRUITMENT: BIDS ON ME SECTION =====
+      Group #RecruitBidsSection {
+        LayoutMode: Top;
+        Visible: false;
+        Padding: (Left: 10, Right: 10);
+
+        Group { Anchor: (Height: 10); }
+
+        // Window timer
+        Label #RecruitWindowTimer {
+          Text: "";
+          Anchor: (Height: 28);
+          Style: (FontSize: 15, TextColor: #777777, RenderBold: true);
+        }
+
+        Group { Anchor: (Height: 1); Background: #2b3542; }
+        Group { Anchor: (Height: 6); }
+
+        // Empty state
+        Label #RecruitBidsEmpty {
+          Text: "No active bids on you.";
+          Anchor: (Height: 40);
+          Style: (FontSize: 15, TextColor: #555555, HorizontalAlignment: Center, VerticalAlignment: Center);
+          Visible: false;
+        }
+
+        // Bid rows (0-7)
+        Group #RecruitBidRow0 {
+          Anchor: (Height: 48);
+          LayoutMode: Left;
+          Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4);
+          Background: @BgCard;
+          Visible: false;
+
+          Group {
+            FlexWeight: 1;
+            LayoutMode: Top;
+
+            Label #RecruitBidGuild0 { Text: ""; Anchor: (Height: 22); Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
+
+            Group {
+              Anchor: (Height: 20);
+              LayoutMode: Left;
+
+              Label #RecruitBidAmount0 { Text: ""; Anchor: (Width: 120); Style: (FontSize: 13, TextColor: #ffd700, VerticalAlignment: Center); }
+              Label #RecruitBidBy0 { Text: ""; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+            }
+          }
+
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBidAccept0 { Text: "Accept"; Anchor: (Width: 65, Height: 28); Style: @SuccessButtonStyle; }
+          Group { Anchor: (Width: 4); }
+          TextButton #RecruitBidDecline0 { Text: "Decline"; Anchor: (Width: 65, Height: 28); Style: @SmallDangerButtonStyle; }
+        }
+
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitBidRow1 {
+          Anchor: (Height: 48);
+          LayoutMode: Left;
+          Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4);
+          Background: @BgCard;
+          Visible: false;
+
+          Group {
+            FlexWeight: 1;
+            LayoutMode: Top;
+
+            Label #RecruitBidGuild1 { Text: ""; Anchor: (Height: 22); Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
+
+            Group {
+              Anchor: (Height: 20);
+              LayoutMode: Left;
+
+              Label #RecruitBidAmount1 { Text: ""; Anchor: (Width: 120); Style: (FontSize: 13, TextColor: #ffd700, VerticalAlignment: Center); }
+              Label #RecruitBidBy1 { Text: ""; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+            }
+          }
+
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBidAccept1 { Text: "Accept"; Anchor: (Width: 65, Height: 28); Style: @SuccessButtonStyle; }
+          Group { Anchor: (Width: 4); }
+          TextButton #RecruitBidDecline1 { Text: "Decline"; Anchor: (Width: 65, Height: 28); Style: @SmallDangerButtonStyle; }
+        }
+
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitBidRow2 {
+          Anchor: (Height: 48);
+          LayoutMode: Left;
+          Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4);
+          Background: @BgCard;
+          Visible: false;
+
+          Group {
+            FlexWeight: 1;
+            LayoutMode: Top;
+
+            Label #RecruitBidGuild2 { Text: ""; Anchor: (Height: 22); Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
+
+            Group {
+              Anchor: (Height: 20);
+              LayoutMode: Left;
+
+              Label #RecruitBidAmount2 { Text: ""; Anchor: (Width: 120); Style: (FontSize: 13, TextColor: #ffd700, VerticalAlignment: Center); }
+              Label #RecruitBidBy2 { Text: ""; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+            }
+          }
+
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBidAccept2 { Text: "Accept"; Anchor: (Width: 65, Height: 28); Style: @SuccessButtonStyle; }
+          Group { Anchor: (Width: 4); }
+          TextButton #RecruitBidDecline2 { Text: "Decline"; Anchor: (Width: 65, Height: 28); Style: @SmallDangerButtonStyle; }
+        }
+
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitBidRow3 {
+          Anchor: (Height: 48);
+          LayoutMode: Left;
+          Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4);
+          Background: @BgCard;
+          Visible: false;
+
+          Group {
+            FlexWeight: 1;
+            LayoutMode: Top;
+
+            Label #RecruitBidGuild3 { Text: ""; Anchor: (Height: 22); Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
+
+            Group {
+              Anchor: (Height: 20);
+              LayoutMode: Left;
+
+              Label #RecruitBidAmount3 { Text: ""; Anchor: (Width: 120); Style: (FontSize: 13, TextColor: #ffd700, VerticalAlignment: Center); }
+              Label #RecruitBidBy3 { Text: ""; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+            }
+          }
+
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBidAccept3 { Text: "Accept"; Anchor: (Width: 65, Height: 28); Style: @SuccessButtonStyle; }
+          Group { Anchor: (Width: 4); }
+          TextButton #RecruitBidDecline3 { Text: "Decline"; Anchor: (Width: 65, Height: 28); Style: @SmallDangerButtonStyle; }
+        }
+
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitBidRow4 {
+          Anchor: (Height: 48); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Group { FlexWeight: 1; LayoutMode: Top;
+            Label #RecruitBidGuild4 { Text: ""; Anchor: (Height: 22); Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
+            Group { Anchor: (Height: 20); LayoutMode: Left;
+              Label #RecruitBidAmount4 { Text: ""; Anchor: (Width: 120); Style: (FontSize: 13, TextColor: #ffd700, VerticalAlignment: Center); }
+              Label #RecruitBidBy4 { Text: ""; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+            }
+          }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBidAccept4 { Text: "Accept"; Anchor: (Width: 65, Height: 28); Style: @SuccessButtonStyle; }
+          Group { Anchor: (Width: 4); }
+          TextButton #RecruitBidDecline4 { Text: "Decline"; Anchor: (Width: 65, Height: 28); Style: @SmallDangerButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitBidRow5 {
+          Anchor: (Height: 48); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Group { FlexWeight: 1; LayoutMode: Top;
+            Label #RecruitBidGuild5 { Text: ""; Anchor: (Height: 22); Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
+            Group { Anchor: (Height: 20); LayoutMode: Left;
+              Label #RecruitBidAmount5 { Text: ""; Anchor: (Width: 120); Style: (FontSize: 13, TextColor: #ffd700, VerticalAlignment: Center); }
+              Label #RecruitBidBy5 { Text: ""; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+            }
+          }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBidAccept5 { Text: "Accept"; Anchor: (Width: 65, Height: 28); Style: @SuccessButtonStyle; }
+          Group { Anchor: (Width: 4); }
+          TextButton #RecruitBidDecline5 { Text: "Decline"; Anchor: (Width: 65, Height: 28); Style: @SmallDangerButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitBidRow6 {
+          Anchor: (Height: 48); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Group { FlexWeight: 1; LayoutMode: Top;
+            Label #RecruitBidGuild6 { Text: ""; Anchor: (Height: 22); Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
+            Group { Anchor: (Height: 20); LayoutMode: Left;
+              Label #RecruitBidAmount6 { Text: ""; Anchor: (Width: 120); Style: (FontSize: 13, TextColor: #ffd700, VerticalAlignment: Center); }
+              Label #RecruitBidBy6 { Text: ""; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+            }
+          }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBidAccept6 { Text: "Accept"; Anchor: (Width: 65, Height: 28); Style: @SuccessButtonStyle; }
+          Group { Anchor: (Width: 4); }
+          TextButton #RecruitBidDecline6 { Text: "Decline"; Anchor: (Width: 65, Height: 28); Style: @SmallDangerButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitBidRow7 {
+          Anchor: (Height: 48); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Group { FlexWeight: 1; LayoutMode: Top;
+            Label #RecruitBidGuild7 { Text: ""; Anchor: (Height: 22); Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
+            Group { Anchor: (Height: 20); LayoutMode: Left;
+              Label #RecruitBidAmount7 { Text: ""; Anchor: (Width: 120); Style: (FontSize: 13, TextColor: #ffd700, VerticalAlignment: Center); }
+              Label #RecruitBidBy7 { Text: ""; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+            }
+          }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBidAccept7 { Text: "Accept"; Anchor: (Width: 65, Height: 28); Style: @SuccessButtonStyle; }
+          Group { Anchor: (Width: 4); }
+          TextButton #RecruitBidDecline7 { Text: "Decline"; Anchor: (Width: 65, Height: 28); Style: @SmallDangerButtonStyle; }
+        }
+      }
+
+      // ===== RECRUITMENT: BROWSE RECRUITS SECTION =====
+      Group #RecruitBrowseSection {
+        LayoutMode: Top;
+        Visible: false;
+        Padding: (Left: 10, Right: 10);
+
+        Group { Anchor: (Height: 10); }
+
+        Label #RecruitBrowseCount {
+          Text: "Available Recruits: 0";
+          Anchor: (Height: 24);
+          Style: (FontSize: 15, TextColor: #96a9be, RenderBold: true);
+        }
+
+        Group { Anchor: (Height: 1); Background: #2b3542; }
+        Group { Anchor: (Height: 6); }
+
+        // Empty state
+        Label #RecruitBrowseEmpty {
+          Text: "No ranked players available.";
+          Anchor: (Height: 40);
+          Style: (FontSize: 15, TextColor: #555555, HorizontalAlignment: Center, VerticalAlignment: Center);
+          Visible: false;
+        }
+
+        // Browse rows (0-9)
+        Group #RecruitBrowseRow0 {
+          Anchor: (Height: 36); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitBrowseRank0 { Text: ""; Anchor: (Width: 30); Style: (FontSize: 18, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitBrowseName0 { Text: ""; FlexWeight: 1; Style: (FontSize: 15, TextColor: #ffffff, VerticalAlignment: Center); }
+          Label #RecruitBrowseStatus0 { Text: ""; Anchor: (Width: 50); Style: (FontSize: 12, TextColor: #4aff7f, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBrowseBid0 { Text: "Bid"; Anchor: (Width: 50, Height: 26); Style: @PrimaryButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitBrowseRow1 {
+          Anchor: (Height: 36); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitBrowseRank1 { Text: ""; Anchor: (Width: 30); Style: (FontSize: 18, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitBrowseName1 { Text: ""; FlexWeight: 1; Style: (FontSize: 15, TextColor: #ffffff, VerticalAlignment: Center); }
+          Label #RecruitBrowseStatus1 { Text: ""; Anchor: (Width: 50); Style: (FontSize: 12, TextColor: #4aff7f, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBrowseBid1 { Text: "Bid"; Anchor: (Width: 50, Height: 26); Style: @PrimaryButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitBrowseRow2 {
+          Anchor: (Height: 36); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitBrowseRank2 { Text: ""; Anchor: (Width: 30); Style: (FontSize: 18, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitBrowseName2 { Text: ""; FlexWeight: 1; Style: (FontSize: 15, TextColor: #ffffff, VerticalAlignment: Center); }
+          Label #RecruitBrowseStatus2 { Text: ""; Anchor: (Width: 50); Style: (FontSize: 12, TextColor: #4aff7f, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBrowseBid2 { Text: "Bid"; Anchor: (Width: 50, Height: 26); Style: @PrimaryButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitBrowseRow3 {
+          Anchor: (Height: 36); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitBrowseRank3 { Text: ""; Anchor: (Width: 30); Style: (FontSize: 18, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitBrowseName3 { Text: ""; FlexWeight: 1; Style: (FontSize: 15, TextColor: #ffffff, VerticalAlignment: Center); }
+          Label #RecruitBrowseStatus3 { Text: ""; Anchor: (Width: 50); Style: (FontSize: 12, TextColor: #4aff7f, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBrowseBid3 { Text: "Bid"; Anchor: (Width: 50, Height: 26); Style: @PrimaryButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitBrowseRow4 {
+          Anchor: (Height: 36); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitBrowseRank4 { Text: ""; Anchor: (Width: 30); Style: (FontSize: 18, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitBrowseName4 { Text: ""; FlexWeight: 1; Style: (FontSize: 15, TextColor: #ffffff, VerticalAlignment: Center); }
+          Label #RecruitBrowseStatus4 { Text: ""; Anchor: (Width: 50); Style: (FontSize: 12, TextColor: #4aff7f, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBrowseBid4 { Text: "Bid"; Anchor: (Width: 50, Height: 26); Style: @PrimaryButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitBrowseRow5 {
+          Anchor: (Height: 36); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitBrowseRank5 { Text: ""; Anchor: (Width: 30); Style: (FontSize: 18, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitBrowseName5 { Text: ""; FlexWeight: 1; Style: (FontSize: 15, TextColor: #ffffff, VerticalAlignment: Center); }
+          Label #RecruitBrowseStatus5 { Text: ""; Anchor: (Width: 50); Style: (FontSize: 12, TextColor: #4aff7f, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBrowseBid5 { Text: "Bid"; Anchor: (Width: 50, Height: 26); Style: @PrimaryButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitBrowseRow6 {
+          Anchor: (Height: 36); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitBrowseRank6 { Text: ""; Anchor: (Width: 30); Style: (FontSize: 18, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitBrowseName6 { Text: ""; FlexWeight: 1; Style: (FontSize: 15, TextColor: #ffffff, VerticalAlignment: Center); }
+          Label #RecruitBrowseStatus6 { Text: ""; Anchor: (Width: 50); Style: (FontSize: 12, TextColor: #4aff7f, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBrowseBid6 { Text: "Bid"; Anchor: (Width: 50, Height: 26); Style: @PrimaryButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitBrowseRow7 {
+          Anchor: (Height: 36); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitBrowseRank7 { Text: ""; Anchor: (Width: 30); Style: (FontSize: 18, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitBrowseName7 { Text: ""; FlexWeight: 1; Style: (FontSize: 15, TextColor: #ffffff, VerticalAlignment: Center); }
+          Label #RecruitBrowseStatus7 { Text: ""; Anchor: (Width: 50); Style: (FontSize: 12, TextColor: #4aff7f, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBrowseBid7 { Text: "Bid"; Anchor: (Width: 50, Height: 26); Style: @PrimaryButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitBrowseRow8 {
+          Anchor: (Height: 36); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitBrowseRank8 { Text: ""; Anchor: (Width: 30); Style: (FontSize: 18, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitBrowseName8 { Text: ""; FlexWeight: 1; Style: (FontSize: 15, TextColor: #ffffff, VerticalAlignment: Center); }
+          Label #RecruitBrowseStatus8 { Text: ""; Anchor: (Width: 50); Style: (FontSize: 12, TextColor: #4aff7f, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBrowseBid8 { Text: "Bid"; Anchor: (Width: 50, Height: 26); Style: @PrimaryButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitBrowseRow9 {
+          Anchor: (Height: 36); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitBrowseRank9 { Text: ""; Anchor: (Width: 30); Style: (FontSize: 18, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitBrowseName9 { Text: ""; FlexWeight: 1; Style: (FontSize: 15, TextColor: #ffffff, VerticalAlignment: Center); }
+          Label #RecruitBrowseStatus9 { Text: ""; Anchor: (Width: 50); Style: (FontSize: 12, TextColor: #4aff7f, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitBrowseBid9 { Text: "Bid"; Anchor: (Width: 50, Height: 26); Style: @PrimaryButtonStyle; }
+        }
+      }
+
+      // ===== RECRUITMENT: GUILD BIDS SECTION (outgoing) =====
+      Group #RecruitGuildBidsSection {
+        LayoutMode: Top;
+        Visible: false;
+        Padding: (Left: 10, Right: 10);
+
+        Group { Anchor: (Height: 10); }
+
+        Label #RecruitGuildBidsTitle {
+          Text: "GUILD BIDS";
+          Anchor: (Height: 28);
+          Style: (FontSize: 16, TextColor: #ffd700, RenderBold: true, LetterSpacing: 1);
+        }
+
+        Group { Anchor: (Height: 1); Background: #2b3542; }
+        Group { Anchor: (Height: 6); }
+
+        // Empty state
+        Label #RecruitGuildBidsEmpty {
+          Text: "No active outgoing bids.";
+          Anchor: (Height: 40);
+          Style: (FontSize: 15, TextColor: #555555, HorizontalAlignment: Center, VerticalAlignment: Center);
+          Visible: false;
+        }
+
+        // Guild bid rows (0-7)
+        Group #RecruitGuildBidRow0 {
+          Anchor: (Height: 42); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitGuildBidRank0 { Text: ""; Anchor: (Width: 26); Style: (FontSize: 16, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitGuildBidName0 { Text: ""; Anchor: (Width: 120); Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
+          Label #RecruitGuildBidAmount0 { Text: ""; Anchor: (Width: 100); Style: (FontSize: 14, TextColor: #ffd700, VerticalAlignment: Center); }
+          Label #RecruitGuildBidBy0 { Text: ""; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitGuildBidWithdraw0 { Text: "Withdraw"; Anchor: (Width: 75, Height: 26); Style: @SmallDangerButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitGuildBidRow1 {
+          Anchor: (Height: 42); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitGuildBidRank1 { Text: ""; Anchor: (Width: 26); Style: (FontSize: 16, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitGuildBidName1 { Text: ""; Anchor: (Width: 120); Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
+          Label #RecruitGuildBidAmount1 { Text: ""; Anchor: (Width: 100); Style: (FontSize: 14, TextColor: #ffd700, VerticalAlignment: Center); }
+          Label #RecruitGuildBidBy1 { Text: ""; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitGuildBidWithdraw1 { Text: "Withdraw"; Anchor: (Width: 75, Height: 26); Style: @SmallDangerButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitGuildBidRow2 {
+          Anchor: (Height: 42); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitGuildBidRank2 { Text: ""; Anchor: (Width: 26); Style: (FontSize: 16, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitGuildBidName2 { Text: ""; Anchor: (Width: 120); Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
+          Label #RecruitGuildBidAmount2 { Text: ""; Anchor: (Width: 100); Style: (FontSize: 14, TextColor: #ffd700, VerticalAlignment: Center); }
+          Label #RecruitGuildBidBy2 { Text: ""; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitGuildBidWithdraw2 { Text: "Withdraw"; Anchor: (Width: 75, Height: 26); Style: @SmallDangerButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitGuildBidRow3 {
+          Anchor: (Height: 42); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitGuildBidRank3 { Text: ""; Anchor: (Width: 26); Style: (FontSize: 16, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitGuildBidName3 { Text: ""; Anchor: (Width: 120); Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
+          Label #RecruitGuildBidAmount3 { Text: ""; Anchor: (Width: 100); Style: (FontSize: 14, TextColor: #ffd700, VerticalAlignment: Center); }
+          Label #RecruitGuildBidBy3 { Text: ""; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitGuildBidWithdraw3 { Text: "Withdraw"; Anchor: (Width: 75, Height: 26); Style: @SmallDangerButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitGuildBidRow4 {
+          Anchor: (Height: 42); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitGuildBidRank4 { Text: ""; Anchor: (Width: 26); Style: (FontSize: 16, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitGuildBidName4 { Text: ""; Anchor: (Width: 120); Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
+          Label #RecruitGuildBidAmount4 { Text: ""; Anchor: (Width: 100); Style: (FontSize: 14, TextColor: #ffd700, VerticalAlignment: Center); }
+          Label #RecruitGuildBidBy4 { Text: ""; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitGuildBidWithdraw4 { Text: "Withdraw"; Anchor: (Width: 75, Height: 26); Style: @SmallDangerButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitGuildBidRow5 {
+          Anchor: (Height: 42); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitGuildBidRank5 { Text: ""; Anchor: (Width: 26); Style: (FontSize: 16, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitGuildBidName5 { Text: ""; Anchor: (Width: 120); Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
+          Label #RecruitGuildBidAmount5 { Text: ""; Anchor: (Width: 100); Style: (FontSize: 14, TextColor: #ffd700, VerticalAlignment: Center); }
+          Label #RecruitGuildBidBy5 { Text: ""; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitGuildBidWithdraw5 { Text: "Withdraw"; Anchor: (Width: 75, Height: 26); Style: @SmallDangerButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitGuildBidRow6 {
+          Anchor: (Height: 42); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitGuildBidRank6 { Text: ""; Anchor: (Width: 26); Style: (FontSize: 16, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitGuildBidName6 { Text: ""; Anchor: (Width: 120); Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
+          Label #RecruitGuildBidAmount6 { Text: ""; Anchor: (Width: 100); Style: (FontSize: 14, TextColor: #ffd700, VerticalAlignment: Center); }
+          Label #RecruitGuildBidBy6 { Text: ""; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitGuildBidWithdraw6 { Text: "Withdraw"; Anchor: (Width: 75, Height: 26); Style: @SmallDangerButtonStyle; }
+        }
+        Group { Anchor: (Height: 2); }
+
+        Group #RecruitGuildBidRow7 {
+          Anchor: (Height: 42); LayoutMode: Left; Padding: (Left: 8, Right: 8, Top: 4, Bottom: 4); Background: @BgCard; Visible: false;
+          Label #RecruitGuildBidRank7 { Text: ""; Anchor: (Width: 26); Style: (FontSize: 16, TextColor: #ffd700, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 8); }
+          Label #RecruitGuildBidName7 { Text: ""; Anchor: (Width: 120); Style: (FontSize: 15, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
+          Label #RecruitGuildBidAmount7 { Text: ""; Anchor: (Width: 100); Style: (FontSize: 14, TextColor: #ffd700, VerticalAlignment: Center); }
+          Label #RecruitGuildBidBy7 { Text: ""; FlexWeight: 1; Style: (FontSize: 13, TextColor: #96a9be, VerticalAlignment: Center); }
+          Group { Anchor: (Width: 6); }
+          TextButton #RecruitGuildBidWithdraw7 { Text: "Withdraw"; Anchor: (Width: 75, Height: 26); Style: @SmallDangerButtonStyle; }
+        }
+      }
       Group #ContentSpacer { FlexWeight: 1; }
 
       // ===== NEWS SECTION =====

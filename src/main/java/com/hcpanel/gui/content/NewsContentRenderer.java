@@ -3,10 +3,12 @@ package com.hcpanel.gui.content;
 import com.hcpanel.config.NewsConfig;
 import com.hcpanel.config.NewsConfig.NewsEntry;
 import com.hcpanel.gui.UnifiedPanelGui.SidebarButton;
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,8 +45,7 @@ public class NewsContentRenderer {
         List<NewsEntry> entries = newsConfig.getEntries();
 
         // Set header info
-        cmd.set("#HeaderSubtitle.Text", "Welcome, " + playerRef.getUsername());
-        cmd.set("#HeaderSubtitle.Style.TextColor", "#4a9eff");
+        cmd.set("#HeaderSubtitle.TextSpans", Message.raw("Welcome, " + playerRef.getUsername()).color(Color.decode("#4a9eff")));
 
         // Count announcements vs updates
         long announcements = entries.stream()
@@ -72,8 +73,7 @@ public class NewsContentRenderer {
 
                 cmd.set(cardId + ".Visible", true);
                 cmd.set("#NewsBorder" + i + ".Background", entry.getTypeColor());
-                cmd.set("#NewsType" + i + ".Text", entry.getTypeLabel());
-                cmd.set("#NewsType" + i + ".Style.TextColor", entry.getTypeColor());
+                cmd.set("#NewsType" + i + ".TextSpans", Message.raw(entry.getTypeLabel()).color(Color.decode(entry.getTypeColor())));
                 cmd.set("#NewsTitle" + i + ".Text", entry.getTitle());
                 cmd.set("#NewsDate" + i + ".Text", entry.getDate());
                 cmd.set("#NewsContent" + i + ".Text", entry.getContent());

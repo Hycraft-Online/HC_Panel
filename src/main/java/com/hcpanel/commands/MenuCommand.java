@@ -1,7 +1,7 @@
 package com.hcpanel.commands;
 
 import com.hcpanel.HC_PanelPlugin;
-import com.hcpanel.gui.UnifiedPanelGui;
+import com.hcpanel.gui.MainMenuGui;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -33,7 +33,7 @@ public class MenuCommand extends AbstractAsyncCommand {
 
     @Override
     protected boolean canGeneratePermission() {
-        return false; // Available to all players
+        return false;
     }
 
     @NonNullDecl
@@ -46,7 +46,6 @@ public class MenuCommand extends AbstractAsyncCommand {
             return CompletableFuture.completedFuture(null);
         }
 
-        // Check if any modules are available
         if (plugin.getAvailableModules().isEmpty()) {
             sender.sendMessage(Message.raw("No modules available. Install HC_Factions, HC_Honor, or HC_Attributes.")
                 .color(Color.YELLOW));
@@ -55,26 +54,22 @@ public class MenuCommand extends AbstractAsyncCommand {
 
         Ref<EntityStore> ref = player.getReference();
         if (ref == null || !ref.isValid()) {
-            sender.sendMessage(Message.raw("Unable to open menu. Please try again.")
-                .color(Color.RED));
+            sender.sendMessage(Message.raw("Unable to open menu. Please try again.").color(Color.RED));
             return CompletableFuture.completedFuture(null);
         }
 
         Store<EntityStore> store = ref.getStore();
         World world = store.getExternalData().getWorld();
 
-        // Open the menu on the world thread
         world.execute(() -> {
             Ref<EntityStore> freshRef = player.getReference();
             if (freshRef == null || !freshRef.isValid()) return;
 
             Store<EntityStore> freshStore = freshRef.getStore();
-            Player freshPlayer = freshStore.getComponent(freshRef, Player.getComponentType());
             PlayerRef playerRef = freshStore.getComponent(freshRef, PlayerRef.getComponentType());
-            if (freshPlayer == null || playerRef == null) return;
+            if (playerRef == null) return;
 
-            freshPlayer.getPageManager().openCustomPage(freshRef, freshStore,
-                new UnifiedPanelGui(plugin, playerRef));
+            MainMenuGui.openMenu(plugin, playerRef, freshStore);
         });
 
         return CompletableFuture.completedFuture(null);

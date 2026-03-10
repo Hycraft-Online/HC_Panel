@@ -4,6 +4,7 @@ import com.hcpanel.gui.UnifiedPanelGui.SidebarButton;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.ui.builder.EventData;
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -19,6 +20,7 @@ import com.hcfactions.models.PlayerData;
 
 import com.hypixel.hytale.server.core.universe.Universe;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -195,8 +197,7 @@ public class FactionsContentRenderer {
 
         GuildRole guildRole = playerData != null ? playerData.getGuildRole() : null;
         String roleName = guildRole != null ? guildRole.getDisplayName() : "Member";
-        cmd.set("#RankValue.Text", roleName);
-        cmd.set("#RankValue.Style.TextColor", getRoleColor(guildRole));
+        cmd.set("#RankValue.TextSpans", Message.raw(roleName).color(Color.decode(getRoleColor(guildRole))));
 
         List<PlayerData> members = plugin.getGuildManager().getGuildMembers(guild.getId());
         int memberCount = members != null ? members.size() : 0;
@@ -218,12 +219,12 @@ public class FactionsContentRenderer {
         int barWidth;
         if (claimCount > maxClaims) {
             cmd.set("#ClaimsDesc.Text", "over limit!");
-            cmd.set("#ClaimsValue.Style.TextColor", "#ff6b6b");
+            cmd.set("#ClaimsValue.TextSpans", Message.raw(claimCount + "/" + maxClaims).color(Color.decode("#ff6b6b")));
             cmd.set("#ClaimsProgressBar.Background", "#ff6b6b");
             barWidth = maxBarWidth;
         } else if (claimCount >= maxClaims && maxClaims > 0) {
             cmd.set("#ClaimsDesc.Text", "fully claimed");
-            cmd.set("#ClaimsValue.Style.TextColor", "#FFD700");
+            cmd.set("#ClaimsValue.TextSpans", Message.raw(claimCount + "/" + maxClaims).color(Color.decode("#FFD700")));
             cmd.set("#ClaimsProgressBar.Background", "#FFD700");
             barWidth = maxBarWidth;
         } else if (maxClaims > 0 && claimCount > 0) {
@@ -365,9 +366,8 @@ public class FactionsContentRenderer {
 
             cmd.set("#MemberRow" + rowIndex + ".Visible", true);
             cmd.set("#MemberName" + rowIndex + ".Text", member.getPlayerName());
-            cmd.set("#MemberRole" + rowIndex + ".Text",
-                memberRole != null ? "[" + memberRole.getDisplayName() + "]" : "[Member]");
-            cmd.set("#MemberRole" + rowIndex + ".Style.TextColor", roleColor);
+            cmd.set("#MemberRole" + rowIndex + ".TextSpans", Message.raw(
+                memberRole != null ? "[" + memberRole.getDisplayName() + "]" : "[Member]").color(Color.decode(roleColor)));
 
             // Online status indicator
             boolean isOnline = onlineUuids.contains(memberUuid);
@@ -662,14 +662,11 @@ public class FactionsContentRenderer {
 
         cmd.set("#FactionStatsSection.Visible", true);
         cmd.set("#PowerValue.Text", String.valueOf(totalPower));
-        cmd.set("#PowerDesc.Text", "combined power");
-        cmd.set("#PowerDesc.Style.TextColor", "#96a9be");
+        cmd.set("#PowerDesc.TextSpans", Message.raw("combined power").color(Color.decode("#96a9be")));
         cmd.set("#RankValue.Text", String.valueOf(guildCount));
-        cmd.set("#RankDesc.Text", "total guilds");
-        cmd.set("#RankDesc.Style.TextColor", "#96a9be");
+        cmd.set("#RankDesc.TextSpans", Message.raw("total guilds").color(Color.decode("#96a9be")));
         cmd.set("#MemberCountValue.Text", String.valueOf(totalMembers));
-        cmd.set("#MembersDesc.Text", "total players");
-        cmd.set("#MembersDesc.Style.TextColor", "#96a9be");
+        cmd.set("#MembersDesc.TextSpans", Message.raw("total players").color(Color.decode("#96a9be")));
 
         // Top 3 guilds leaderboard (sorted by power)
         if (guilds != null && !guilds.isEmpty()) {
