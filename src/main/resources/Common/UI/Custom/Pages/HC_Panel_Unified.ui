@@ -42,6 +42,13 @@
   Pressed: (Background: #2a2f3a, LabelStyle: (FontSize: 16, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
 );
 
+// Quick Action Button (clickable text links on home screen)
+@QuickActionBtnStyle = TextButtonStyle(
+  Default: (Background: #000000(0), LabelStyle: (FontSize: 13, TextColor: #e2e8f0, VerticalAlignment: Center)),
+  Hovered: (Background: #1a3050(0.6), LabelStyle: (FontSize: 13, TextColor: #ffffff, VerticalAlignment: Center)),
+  Pressed: (Background: #0a2040(0.6), LabelStyle: (FontSize: 13, TextColor: #4ecdc4, VerticalAlignment: Center)),
+);
+
 // Primary Action Button (Join, Accept)
 @PrimaryButtonStyle = TextButtonStyle(
   Default: (Background: #3a7bd5, LabelStyle: (FontSize: 14, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center, VerticalAlignment: Center)),
@@ -141,61 +148,185 @@ Group {
 
       Group { Anchor: (Height: 20); }
 
-      // Navigation Buttons (7 slots)
-      TextButton #SidebarBtn0 {
-        Text: "";
+      // Navigation Buttons (10 slots)
+      Group #SidebarBtn0Row {
+        LayoutMode: Left;
         Anchor: (Height: 40);
-        Style: @MenuButtonStyle;
         Visible: false;
-        Padding: (Full: 16);
+
+        Group #SidebarBtn0Accent {
+          Anchor: (Width: 3, Height: 40);
+          Background: #000000(0);
+        }
+
+        TextButton #SidebarBtn0 {
+          Text: "";
+          FlexWeight: 1;
+          Style: @MenuButtonStyle;
+          Padding: (Left: 13, Right: 16, Top: 16, Bottom: 16);
+        }
       }
 
-      TextButton #SidebarBtn1 {
-        Text: "";
+      Group #SidebarBtn1Row {
+        LayoutMode: Left;
         Anchor: (Height: 40);
-        Style: @MenuButtonStyle;
         Visible: false;
-        Padding: (Full: 16);
+
+        Group #SidebarBtn1Accent {
+          Anchor: (Width: 3, Height: 40);
+          Background: #000000(0);
+        }
+
+        TextButton #SidebarBtn1 {
+          Text: "";
+          FlexWeight: 1;
+          Style: @MenuButtonStyle;
+          Padding: (Left: 13, Right: 16, Top: 16, Bottom: 16);
+        }
       }
 
-      TextButton #SidebarBtn2 {
-        Text: "";
+      Group #SidebarBtn2Row {
+        LayoutMode: Left;
         Anchor: (Height: 40);
-        Style: @MenuButtonStyle;
         Visible: false;
-        Padding: (Full: 16);
+
+        Group #SidebarBtn2Accent {
+          Anchor: (Width: 3, Height: 40);
+          Background: #000000(0);
+        }
+
+        TextButton #SidebarBtn2 {
+          Text: "";
+          FlexWeight: 1;
+          Style: @MenuButtonStyle;
+          Padding: (Left: 13, Right: 16, Top: 16, Bottom: 16);
+        }
       }
 
-      TextButton #SidebarBtn3 {
-        Text: "";
+      Group #SidebarBtn3Row {
+        LayoutMode: Left;
         Anchor: (Height: 40);
-        Style: @MenuButtonStyle;
         Visible: false;
-        Padding: (Full: 16);
+
+        Group #SidebarBtn3Accent {
+          Anchor: (Width: 3, Height: 40);
+          Background: #000000(0);
+        }
+
+        TextButton #SidebarBtn3 {
+          Text: "";
+          FlexWeight: 1;
+          Style: @MenuButtonStyle;
+          Padding: (Left: 13, Right: 16, Top: 16, Bottom: 16);
+        }
       }
 
-      TextButton #SidebarBtn4 {
-        Text: "";
+      Group #SidebarBtn4Row {
+        LayoutMode: Left;
         Anchor: (Height: 40);
-        Style: @MenuButtonStyle;
         Visible: false;
-        Padding: (Full: 16);
+
+        Group #SidebarBtn4Accent {
+          Anchor: (Width: 3, Height: 40);
+          Background: #000000(0);
+        }
+
+        TextButton #SidebarBtn4 {
+          Text: "";
+          FlexWeight: 1;
+          Style: @MenuButtonStyle;
+          Padding: (Left: 13, Right: 16, Top: 16, Bottom: 16);
+        }
       }
 
-      TextButton #SidebarBtn5 {
-        Text: "";
+      Group #SidebarBtn5Row {
+        LayoutMode: Left;
         Anchor: (Height: 40);
-        Style: @MenuButtonStyle;
         Visible: false;
-        Padding: (Full: 16);
+
+        Group #SidebarBtn5Accent {
+          Anchor: (Width: 3, Height: 40);
+          Background: #000000(0);
+        }
+
+        TextButton #SidebarBtn5 {
+          Text: "";
+          FlexWeight: 1;
+          Style: @MenuButtonStyle;
+          Padding: (Left: 13, Right: 16, Top: 16, Bottom: 16);
+        }
       }
 
-      TextButton #SidebarBtn6 {
-        Text: "";
+      Group #SidebarBtn6Row {
+        LayoutMode: Left;
         Anchor: (Height: 40);
-        Style: @MenuButtonStyle;
         Visible: false;
-        Padding: (Full: 16);
+
+        Group #SidebarBtn6Accent {
+          Anchor: (Width: 3, Height: 40);
+          Background: #000000(0);
+        }
+
+        TextButton #SidebarBtn6 {
+          Text: "";
+          FlexWeight: 1;
+          Style: @MenuButtonStyle;
+          Padding: (Left: 13, Right: 16, Top: 16, Bottom: 16);
+        }
+      }
+
+      Group #SidebarBtn7Row {
+        LayoutMode: Left;
+        Anchor: (Height: 40);
+        Visible: false;
+
+        Group #SidebarBtn7Accent {
+          Anchor: (Width: 3, Height: 40);
+          Background: #000000(0);
+        }
+
+        TextButton #SidebarBtn7 {
+          Text: "";
+          FlexWeight: 1;
+          Style: @MenuButtonStyle;
+          Padding: (Left: 13, Right: 16, Top: 16, Bottom: 16);
+        }
+      }
+
+      Group #SidebarBtn8Row {
+        LayoutMode: Left;
+        Anchor: (Height: 40);
+        Visible: false;
+
+        Group #SidebarBtn8Accent {
+          Anchor: (Width: 3, Height: 40);
+          Background: #000000(0);
+        }
+
+        TextButton #SidebarBtn8 {
+          Text: "";
+          FlexWeight: 1;
+          Style: @MenuButtonStyle;
+          Padding: (Left: 13, Right: 16, Top: 16, Bottom: 16);
+        }
+      }
+
+      Group #SidebarBtn9Row {
+        LayoutMode: Left;
+        Anchor: (Height: 40);
+        Visible: false;
+
+        Group #SidebarBtn9Accent {
+          Anchor: (Width: 3, Height: 40);
+          Background: #000000(0);
+        }
+
+        TextButton #SidebarBtn9 {
+          Text: "";
+          FlexWeight: 1;
+          Style: @MenuButtonStyle;
+          Padding: (Left: 13, Right: 16, Top: 16, Bottom: 16);
+        }
       }
 
       Group { FlexWeight: 1; }
@@ -2186,6 +2317,15 @@ Group {
           Style: @SmallDangerButtonStyle;
         }
 
+        Group { Anchor: (Width: 12); }
+
+        TextButton #DisbandGuildBtn {
+          Text: "DISBAND GUILD";
+          Anchor: (Width: 150, Height: 36);
+          Style: @SmallDangerButtonStyle;
+          Visible: false;
+        }
+
         Group { FlexWeight: 1; }
       }
 
@@ -2512,62 +2652,100 @@ Group {
 
         Group { Anchor: (Height: 6); }
 
+        // Player's spendable honor balance
+        Group #HonorShopBalanceRow {
+          Anchor: (Height: 32, Bottom: 4);
+          Background: #1e3a2a(0.6);
+          LayoutMode: Left;
+          Padding: (Left: 14, Right: 14);
+
+          Label { Text: "Your Balance:"; Anchor: (Width: 110); Style: (FontSize: 13, TextColor: #8fa4b8, VerticalAlignment: Center); }
+          Label #HonorShopBalance { Text: "0"; Anchor: (Width: 120); Style: (FontSize: 16, TextColor: #d4af37, RenderBold: true, VerticalAlignment: Center); }
+          Group { FlexWeight: 1; }
+          Label #HonorShopRankInfo { Text: ""; Anchor: (Width: 160); Style: (FontSize: 12, TextColor: #8fa4b8, VerticalAlignment: Center, HorizontalAlignment: End); }
+        }
+
         // Column Headers Row (fixed, outside scroll)
         Group #HonorShopHeader {
-          Anchor: (Height: 32, Bottom: 2);
+          Anchor: (Height: 28, Bottom: 2);
           Background: #0a1119(0.6);
           LayoutMode: Left;
-          Padding: (Left: 14, Right: 24);
+          Padding: (Left: 14, Right: 14);
 
-          Label { Text: "ITEM"; Anchor: (Width: 180); Style: (FontSize: 14, TextColor: #6b7a8a, RenderBold: true, LetterSpacing: 1, VerticalAlignment: Center); }
-          Label { Text: "COST"; Anchor: (Width: 100); Style: (FontSize: 14, TextColor: #6b7a8a, RenderBold: true, LetterSpacing: 1, VerticalAlignment: Center); }
+          Label { Text: "ITEM"; Anchor: (Width: 220); Style: (FontSize: 12, TextColor: #6b7a8a, RenderBold: true, LetterSpacing: 1, VerticalAlignment: Center); }
+          Label { Text: "COST"; Anchor: (Width: 80); Style: (FontSize: 12, TextColor: #6b7a8a, RenderBold: true, LetterSpacing: 1, VerticalAlignment: Center); }
+          Label { Text: "RANK"; Anchor: (Width: 60); Style: (FontSize: 12, TextColor: #6b7a8a, RenderBold: true, LetterSpacing: 1, VerticalAlignment: Center, HorizontalAlignment: Center); }
           Group { FlexWeight: 1; }
-          Label { Text: ""; Anchor: (Width: 55); }
+          Label { Text: ""; Anchor: (Width: 60); }
         }
 
         // Scrollable container for shop rows
         Group #ShopScrollContainer {
-          Anchor: (Height: 370);
+          Anchor: (Height: 340);
           LayoutMode: TopScrolling;
           Background: #0a1119(0.3);
           Padding: (Full: 6);
           ScrollbarStyle: @PanelScrollbarStyle;
 
-          Group #ShopRow0 { Anchor: (Height: 56, Bottom: 4); Background: #1b2532(0.8); LayoutMode: Left; Padding: (Left: 14, Right: 14); Visible: false;
-            Label #ShopItem0 { Text: ""; Anchor: (Width: 180); Style: (FontSize: 16, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
-            Label #ShopCost0 { Text: ""; Anchor: (Width: 100); Style: (FontSize: 14, TextColor: #d4af37, RenderBold: true, VerticalAlignment: Center); }
+          Group #ShopRow0 { Anchor: (Height: 62, Bottom: 4); Background: #1b2532(0.8); LayoutMode: Left; Padding: (Left: 14, Right: 14); Visible: false;
+            Group { Anchor: (Width: 220); LayoutMode: Top; Padding: (Top: 8);
+              Label #ShopItem0 { Text: ""; Anchor: (Height: 22); Style: (FontSize: 14, TextColor: #ffffff, RenderBold: true); }
+              Label #ShopDesc0 { Text: ""; Anchor: (Height: 18); Style: (FontSize: 10, TextColor: #6b7a8a); }
+            }
+            Label #ShopCost0 { Text: ""; Anchor: (Width: 80); Style: (FontSize: 14, TextColor: #d4af37, RenderBold: true, VerticalAlignment: Center); }
+            Label #ShopRank0 { Text: ""; Anchor: (Width: 60); Style: (FontSize: 11, TextColor: #8fa4b8, VerticalAlignment: Center, HorizontalAlignment: Center); }
             Group { FlexWeight: 1; }
-            TextButton #ShopBuy0 { Text: "BUY"; Anchor: (Width: 55, Height: 26); Style: @PrimaryButtonStyle; }
+            TextButton #ShopBuy0 { Text: "BUY"; Anchor: (Width: 60, Height: 28); Style: @PrimaryButtonStyle; }
           }
-          Group #ShopRow1 { Anchor: (Height: 56, Bottom: 4); Background: #1b2532(0.8); LayoutMode: Left; Padding: (Left: 14, Right: 14); Visible: false;
-            Label #ShopItem1 { Text: ""; Anchor: (Width: 180); Style: (FontSize: 16, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
-            Label #ShopCost1 { Text: ""; Anchor: (Width: 100); Style: (FontSize: 14, TextColor: #d4af37, RenderBold: true, VerticalAlignment: Center); }
+          Group #ShopRow1 { Anchor: (Height: 62, Bottom: 4); Background: #1b2532(0.8); LayoutMode: Left; Padding: (Left: 14, Right: 14); Visible: false;
+            Group { Anchor: (Width: 220); LayoutMode: Top; Padding: (Top: 8);
+              Label #ShopItem1 { Text: ""; Anchor: (Height: 22); Style: (FontSize: 14, TextColor: #ffffff, RenderBold: true); }
+              Label #ShopDesc1 { Text: ""; Anchor: (Height: 18); Style: (FontSize: 10, TextColor: #6b7a8a); }
+            }
+            Label #ShopCost1 { Text: ""; Anchor: (Width: 80); Style: (FontSize: 14, TextColor: #d4af37, RenderBold: true, VerticalAlignment: Center); }
+            Label #ShopRank1 { Text: ""; Anchor: (Width: 60); Style: (FontSize: 11, TextColor: #8fa4b8, VerticalAlignment: Center, HorizontalAlignment: Center); }
             Group { FlexWeight: 1; }
-            TextButton #ShopBuy1 { Text: "BUY"; Anchor: (Width: 55, Height: 26); Style: @PrimaryButtonStyle; }
+            TextButton #ShopBuy1 { Text: "BUY"; Anchor: (Width: 60, Height: 28); Style: @PrimaryButtonStyle; }
           }
-          Group #ShopRow2 { Anchor: (Height: 56, Bottom: 4); Background: #1b2532(0.8); LayoutMode: Left; Padding: (Left: 14, Right: 14); Visible: false;
-            Label #ShopItem2 { Text: ""; Anchor: (Width: 180); Style: (FontSize: 16, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
-            Label #ShopCost2 { Text: ""; Anchor: (Width: 100); Style: (FontSize: 14, TextColor: #d4af37, RenderBold: true, VerticalAlignment: Center); }
+          Group #ShopRow2 { Anchor: (Height: 62, Bottom: 4); Background: #1b2532(0.8); LayoutMode: Left; Padding: (Left: 14, Right: 14); Visible: false;
+            Group { Anchor: (Width: 220); LayoutMode: Top; Padding: (Top: 8);
+              Label #ShopItem2 { Text: ""; Anchor: (Height: 22); Style: (FontSize: 14, TextColor: #ffffff, RenderBold: true); }
+              Label #ShopDesc2 { Text: ""; Anchor: (Height: 18); Style: (FontSize: 10, TextColor: #6b7a8a); }
+            }
+            Label #ShopCost2 { Text: ""; Anchor: (Width: 80); Style: (FontSize: 14, TextColor: #d4af37, RenderBold: true, VerticalAlignment: Center); }
+            Label #ShopRank2 { Text: ""; Anchor: (Width: 60); Style: (FontSize: 11, TextColor: #8fa4b8, VerticalAlignment: Center, HorizontalAlignment: Center); }
             Group { FlexWeight: 1; }
-            TextButton #ShopBuy2 { Text: "BUY"; Anchor: (Width: 55, Height: 26); Style: @PrimaryButtonStyle; }
+            TextButton #ShopBuy2 { Text: "BUY"; Anchor: (Width: 60, Height: 28); Style: @PrimaryButtonStyle; }
           }
-          Group #ShopRow3 { Anchor: (Height: 56, Bottom: 4); Background: #1b2532(0.8); LayoutMode: Left; Padding: (Left: 14, Right: 14); Visible: false;
-            Label #ShopItem3 { Text: ""; Anchor: (Width: 180); Style: (FontSize: 16, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
-            Label #ShopCost3 { Text: ""; Anchor: (Width: 100); Style: (FontSize: 14, TextColor: #d4af37, RenderBold: true, VerticalAlignment: Center); }
+          Group #ShopRow3 { Anchor: (Height: 62, Bottom: 4); Background: #1b2532(0.8); LayoutMode: Left; Padding: (Left: 14, Right: 14); Visible: false;
+            Group { Anchor: (Width: 220); LayoutMode: Top; Padding: (Top: 8);
+              Label #ShopItem3 { Text: ""; Anchor: (Height: 22); Style: (FontSize: 14, TextColor: #ffffff, RenderBold: true); }
+              Label #ShopDesc3 { Text: ""; Anchor: (Height: 18); Style: (FontSize: 10, TextColor: #6b7a8a); }
+            }
+            Label #ShopCost3 { Text: ""; Anchor: (Width: 80); Style: (FontSize: 14, TextColor: #d4af37, RenderBold: true, VerticalAlignment: Center); }
+            Label #ShopRank3 { Text: ""; Anchor: (Width: 60); Style: (FontSize: 11, TextColor: #8fa4b8, VerticalAlignment: Center, HorizontalAlignment: Center); }
             Group { FlexWeight: 1; }
-            TextButton #ShopBuy3 { Text: "BUY"; Anchor: (Width: 55, Height: 26); Style: @PrimaryButtonStyle; }
+            TextButton #ShopBuy3 { Text: "BUY"; Anchor: (Width: 60, Height: 28); Style: @PrimaryButtonStyle; }
           }
-          Group #ShopRow4 { Anchor: (Height: 56, Bottom: 4); Background: #1b2532(0.8); LayoutMode: Left; Padding: (Left: 14, Right: 14); Visible: false;
-            Label #ShopItem4 { Text: ""; Anchor: (Width: 180); Style: (FontSize: 16, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
-            Label #ShopCost4 { Text: ""; Anchor: (Width: 100); Style: (FontSize: 14, TextColor: #d4af37, RenderBold: true, VerticalAlignment: Center); }
+          Group #ShopRow4 { Anchor: (Height: 62, Bottom: 4); Background: #1b2532(0.8); LayoutMode: Left; Padding: (Left: 14, Right: 14); Visible: false;
+            Group { Anchor: (Width: 220); LayoutMode: Top; Padding: (Top: 8);
+              Label #ShopItem4 { Text: ""; Anchor: (Height: 22); Style: (FontSize: 14, TextColor: #ffffff, RenderBold: true); }
+              Label #ShopDesc4 { Text: ""; Anchor: (Height: 18); Style: (FontSize: 10, TextColor: #6b7a8a); }
+            }
+            Label #ShopCost4 { Text: ""; Anchor: (Width: 80); Style: (FontSize: 14, TextColor: #d4af37, RenderBold: true, VerticalAlignment: Center); }
+            Label #ShopRank4 { Text: ""; Anchor: (Width: 60); Style: (FontSize: 11, TextColor: #8fa4b8, VerticalAlignment: Center, HorizontalAlignment: Center); }
             Group { FlexWeight: 1; }
-            TextButton #ShopBuy4 { Text: "BUY"; Anchor: (Width: 55, Height: 26); Style: @PrimaryButtonStyle; }
+            TextButton #ShopBuy4 { Text: "BUY"; Anchor: (Width: 60, Height: 28); Style: @PrimaryButtonStyle; }
           }
-          Group #ShopRow5 { Anchor: (Height: 56, Bottom: 4); Background: #1b2532(0.8); LayoutMode: Left; Padding: (Left: 14, Right: 14); Visible: false;
-            Label #ShopItem5 { Text: ""; Anchor: (Width: 180); Style: (FontSize: 16, TextColor: #ffffff, RenderBold: true, VerticalAlignment: Center); }
-            Label #ShopCost5 { Text: ""; Anchor: (Width: 100); Style: (FontSize: 14, TextColor: #d4af37, RenderBold: true, VerticalAlignment: Center); }
+          Group #ShopRow5 { Anchor: (Height: 62, Bottom: 4); Background: #1b2532(0.8); LayoutMode: Left; Padding: (Left: 14, Right: 14); Visible: false;
+            Group { Anchor: (Width: 220); LayoutMode: Top; Padding: (Top: 8);
+              Label #ShopItem5 { Text: ""; Anchor: (Height: 22); Style: (FontSize: 14, TextColor: #ffffff, RenderBold: true); }
+              Label #ShopDesc5 { Text: ""; Anchor: (Height: 18); Style: (FontSize: 10, TextColor: #6b7a8a); }
+            }
+            Label #ShopCost5 { Text: ""; Anchor: (Width: 80); Style: (FontSize: 14, TextColor: #d4af37, RenderBold: true, VerticalAlignment: Center); }
+            Label #ShopRank5 { Text: ""; Anchor: (Width: 60); Style: (FontSize: 11, TextColor: #8fa4b8, VerticalAlignment: Center, HorizontalAlignment: Center); }
             Group { FlexWeight: 1; }
-            TextButton #ShopBuy5 { Text: "BUY"; Anchor: (Width: 55, Height: 26); Style: @PrimaryButtonStyle; }
+            TextButton #ShopBuy5 { Text: "BUY"; Anchor: (Width: 60, Height: 28); Style: @PrimaryButtonStyle; }
           }
         }
       }
@@ -6126,6 +6304,33 @@ Group {
           FlexWeight: 1;
           LayoutMode: TopScrolling;
           ScrollbarStyle: @PanelScrollbarStyle;
+
+          // ── Quick Actions / Contextual Tips ──
+          Group #QuickActionsCard {
+            Anchor: (Height: 110);
+            LayoutMode: Top;
+            Background: #0d1b2a(0.95);
+            Visible: false;
+            Padding: (Left: 16, Right: 16, Top: 12, Bottom: 12);
+
+            Label #QuickActionsTitle {
+              Text: "ACTION ITEMS";
+              Anchor: (Height: 20);
+              Style: (FontSize: 12, TextColor: #4ecdc4, RenderBold: true, LetterSpacing: 1);
+            }
+
+            Group {
+              FlexWeight: 1;
+              LayoutMode: Top;
+              Padding: (Top: 4);
+
+              TextButton #QuickAction0 { Text: ""; Anchor: (Height: 20); Style: @QuickActionBtnStyle; Visible: false; }
+              TextButton #QuickAction1 { Text: ""; Anchor: (Height: 20); Style: @QuickActionBtnStyle; Visible: false; }
+              TextButton #QuickAction2 { Text: ""; Anchor: (Height: 20); Style: @QuickActionBtnStyle; Visible: false; }
+              TextButton #QuickAction3 { Text: ""; Anchor: (Height: 20); Style: @QuickActionBtnStyle; Visible: false; }
+            }
+          }
+          Group #QuickActionsSpacer { Anchor: (Height: 8); Visible: false; }
 
           // News Card 0
           Group #NewsCard0 {

@@ -5,6 +5,18 @@
       "date": "2026-02-02",
       "type": "announcement",
       "content": "The megapatch has arrived! New players spawn in a private tutorial to gear up, choose their class, and select a faction before entering the main world.\n\nThree classes are available: Warrior (tank/melee DPS), Ranger (ranged DPS), and Rogue (stealth melee). Each features branching talent trees with two paths unlocked as you level. The new gear system introduces five rarity tiers from Common to Legendary with 30+ random affixes.\n\nGuilds and factions bring social gameplay with land claims to protect your builds. Fracture Gates offer instanced zombie survival arenas with scaling difficulty - party up and battle waves of undead for gold rewards.\n\nAll players have been reset to Level 1. The current cap is Level 10 while we monitor balance. Existing gear has been converted with re-rolled affixes. Respecs are free - experiment with different builds!\n\nThank you for helping shape Hycraft Online during alpha!"
+    },
+    {
+      "title": "Quick Start Guide",
+      "date": "2026-02-02",
+      "type": "update",
+      "content": "Welcome to Hycraft Online! Here's how to get started:\n\n1. Choose your class with /class — Warrior, Rogue, Ranger, or Mage\n2. Pick a faction with /faction and join a guild\n3. Open this panel anytime with /menu to manage your character\n4. Allocate stat points under Character > Allocate\n5. Spend talent points under Character > Talents\n6. Level up tradeskills by gathering resources in the world\n7. Choose a main profession with /profession choose\n8. Party up with /party for dungeons and group content\n\nCheck the Guide tab in the sidebar for detailed info on every system!"
+    },
+    {
+      "title": "Recruitment & Asylum",
+      "date": "2026-02-02",
+      "type": "update",
+      "content": "The Recruitment system is now active! Guildless players can prove themselves by completing the Asylum boss fight to earn a permanent rank (S through D). Once ranked, your bidding window opens and guilds can place gold bids to recruit you.\n\nGuild officers: browse ranked players in /menu > Recruitment > Browse Recruits and place bids on top talent. Recruits: check /menu > Recruitment > Bids on Me to review offers."
     }
   ]
 }

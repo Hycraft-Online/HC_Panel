@@ -440,7 +440,11 @@ public class RecruitmentContentRenderer {
 
         // Rank tier legend
         cmd.set("#RecruitTierLegend.Visible", true);
-        cmd.set("#FooterText.Text", "Rank is based on your performance in the Asylum boss fight.");
+        if (rankInfo == null) {
+            cmd.set("#FooterText.Text", "Enter the Asylum dungeon and defeat the boss to earn your rank. Higher damage % earns a better tier.");
+        } else {
+            cmd.set("#FooterText.Text", "Your rank is permanent. Guilds can bid gold to recruit you during bidding windows. Check Bids on Me for offers.");
+        }
     }
 
     // ═══════════════════════════════════════════════════════
@@ -563,9 +567,13 @@ public class RecruitmentContentRenderer {
                 // Check window status
                 boolean hasWindow = windowManager != null && invokeHasOpenWindow(windowManager, recruitUuid);
 
+                double damagePercent = invokeRankInfoDamagePercent(info);
+                boolean bossDefeated = invokeRankInfoBossDefeated(info);
+
                 cmd.set("#RecruitBrowseRow" + row + ".Visible", true);
                 cmd.set("#RecruitBrowseRank" + row + ".TextSpans", Message.raw(rankDisplay).color(Color.decode(rankColor)));
-                cmd.set("#RecruitBrowseName" + row + ".Text", name);
+                String nameWithStats = name + " (" + String.format("%.1f%%", damagePercent) + (bossDefeated ? ", Boss killed" : "") + ")";
+                cmd.set("#RecruitBrowseName" + row + ".Text", nameWithStats);
                 cmd.set("#RecruitBrowseStatus" + row + ".TextSpans", Message.raw(hasWindow ? "OPEN" : "").color(Color.decode(hasWindow ? "#4aff7f" : "#555555")));
 
                 // Bid button (only useful for guild officers, but show for all)
@@ -581,7 +589,7 @@ public class RecruitmentContentRenderer {
             }
         }
 
-        cmd.set("#FooterText.Text", "Use /recruit bid <player> <amount> for custom amounts.");
+        cmd.set("#FooterText.Text", "Bid button places a quick 100g bid. Use /recruit bid <player> <amount> for custom amounts.");
     }
 
     // ═══════════════════════════════════════════════════════
@@ -661,7 +669,12 @@ public class RecruitmentContentRenderer {
             }
         }
 
-        cmd.set("#FooterText.Text", "Withdrawing a bid refunds the escrowed gold to your guild bank.");
+        int bidCount = 0;
+        if (guildId != null) {
+            List<?> bids = invokeGetActiveBidsForGuild(bidManager, guildId);
+            bidCount = bids.size();
+        }
+        cmd.set("#FooterText.Text", bidCount + " active bid" + (bidCount != 1 ? "s" : "") + ". Withdrawing refunds escrowed gold. Use /recruit bid <player> <amount> for custom bids.");
     }
 
     // ═══════════════════════════════════════════════════════

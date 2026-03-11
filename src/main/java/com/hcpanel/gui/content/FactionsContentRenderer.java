@@ -67,8 +67,8 @@ public class FactionsContentRenderer {
         // Always show guild option
         buttons.add(new SidebarButton("My Guild", "nav:factions:guild", null, "#4a9eff", isGuild));
 
-        // Show manage members for officers+
-        if (isOfficerOrHigher()) {
+        // Show members for all guild members (management buttons only shown for officers+)
+        if (resolveGuild() != null) {
             buttons.add(new SidebarButton("Members", "nav:factions:members", null, "#4a9eff", isMembers));
         }
 
@@ -186,7 +186,40 @@ public class FactionsContentRenderer {
         PlayerData playerData = resolvePlayerData();
         Faction faction = resolveFaction();
 
+        // Guild name hero header
+        cmd.set("#HonorHeroSection.Visible", true);
+        String guildDisplayName = guild.getName();
+        String tag = guild.getTag();
+        if (tag != null && !tag.isEmpty()) {
+            guildDisplayName = "[" + tag + "] " + guildDisplayName;
+        }
+        String factionColor = faction != null ? faction.getColorHex() : "#4a9eff";
+        cmd.set("#HonorRankNumber.TextSpans", Message.raw(tag != null ? tag : "G").color(Color.decode(factionColor)));
+        cmd.set("#HonorRankTitle.TextSpans", Message.raw(guildDisplayName.toUpperCase()).color(Color.decode(factionColor)));
+        cmd.set("#HonorPlayerName.Text", faction != null ? faction.getDisplayName() : "");
+        cmd.set("#HonorEmblemOuter.Background", factionColor);
 
+        // Hide the progress bar and RP text (not needed for guild)
+        com.hypixel.hytale.server.core.ui.Anchor zeroProg = new com.hypixel.hytale.server.core.ui.Anchor();
+        zeroProg.setWidth(com.hypixel.hytale.server.core.ui.Value.of(0));
+        zeroProg.setHeight(com.hypixel.hytale.server.core.ui.Value.of(20));
+        cmd.setObject("#HonorHeroProgressBar.Anchor", zeroProg);
+        cmd.set("#HonorRPToNextRank.Text", "");
+
+        // Find guild leader name
+        List<PlayerData> allMembers = plugin.getGuildManager().getGuildMembers(guild.getId());
+        String leaderName = null;
+        if (allMembers != null) {
+            for (PlayerData m : allMembers) {
+                if (m.getGuildRole() == GuildRole.LEADER) {
+                    leaderName = m.getPlayerName();
+                    break;
+                }
+            }
+        }
+        if (leaderName != null) {
+            cmd.set("#HonorFactionTag.TextSpans", Message.raw("Leader: " + leaderName).color(Color.decode("#d4af37")));
+        }
 
         // Stats section
         cmd.set("#FactionStatsSection.Visible", true);
@@ -270,9 +303,15 @@ public class FactionsContentRenderer {
         cmd.set("#QuickInfoText.Text",
             factionName + " -- Power drives land claims. Recruit members to grow stronger.");
 
-        // Leave guild (non-leaders)
-        if (guildRole != GuildRole.LEADER) {
-            cmd.set("#GuildActionsSection.Visible", true);
+        // Guild actions section
+        cmd.set("#GuildActionsSection.Visible", true);
+        if (guildRole == GuildRole.LEADER) {
+            // Leader can disband
+            cmd.set("#DisbandGuildBtn.Visible", true);
+            events.addEventBinding(CustomUIEventBindingType.Activating, "#DisbandGuildBtn",
+                EventData.of("Action", "action:disband_guild:confirm"), false);
+        } else {
+            // Non-leaders can leave
             events.addEventBinding(CustomUIEventBindingType.Activating, "#LeaveGuildBtn",
                 EventData.of("Action", "action:leave_guild:confirm"), false);
         }
@@ -283,6 +322,18 @@ public class FactionsContentRenderer {
     private void renderNoGuild(UICommandBuilder cmd, UIEventBuilder events) {
         Faction faction = resolveFaction();
 
+        // Show a "no guild" hero header
+        cmd.set("#HonorHeroSection.Visible", true);
+        cmd.set("#HonorRankNumber.TextSpans", Message.raw("?").color(Color.decode("#777777")));
+        cmd.set("#HonorRankTitle.TextSpans", Message.raw("NO GUILD").color(Color.decode("#777777")));
+        cmd.set("#HonorEmblemOuter.Background", "#444444");
+        cmd.set("#HonorPlayerName.Text", faction != null ? faction.getDisplayName() : "No faction");
+        cmd.set("#HonorFactionTag.TextSpans", Message.raw(playerRef.getUsername()).color(Color.decode("#96a9be")));
+        com.hypixel.hytale.server.core.ui.Anchor zeroProg = new com.hypixel.hytale.server.core.ui.Anchor();
+        zeroProg.setWidth(com.hypixel.hytale.server.core.ui.Value.of(0));
+        zeroProg.setHeight(com.hypixel.hytale.server.core.ui.Value.of(20));
+        cmd.setObject("#HonorHeroProgressBar.Anchor", zeroProg);
+        cmd.set("#HonorRPToNextRank.Text", "");
 
         // Create guild section (only if player has a faction)
         if (faction != null) {
@@ -322,7 +373,20 @@ public class FactionsContentRenderer {
         PlayerData myData = resolvePlayerData();
         GuildRole myRole = myData != null ? myData.getGuildRole() : null;
 
-
+        // Guild header (reuse honor hero section)
+        String factionColor = faction != null ? faction.getColorHex() : "#4a9eff";
+        cmd.set("#HonorHeroSection.Visible", true);
+        String tag = guild.getTag();
+        cmd.set("#HonorRankNumber.TextSpans", Message.raw(tag != null ? tag : "M").color(Color.decode(factionColor)));
+        cmd.set("#HonorRankTitle.TextSpans", Message.raw((guild.getName() + " - Members").toUpperCase()).color(Color.decode(factionColor)));
+        cmd.set("#HonorEmblemOuter.Background", factionColor);
+        cmd.set("#HonorPlayerName.Text", myRole != null ? "Your Role: " + myRole.getDisplayName() : "");
+        cmd.set("#HonorFactionTag.TextSpans", Message.raw("").color(Color.WHITE));
+        com.hypixel.hytale.server.core.ui.Anchor zeroProg = new com.hypixel.hytale.server.core.ui.Anchor();
+        zeroProg.setWidth(com.hypixel.hytale.server.core.ui.Value.of(0));
+        zeroProg.setHeight(com.hypixel.hytale.server.core.ui.Value.of(20));
+        cmd.setObject("#HonorHeroProgressBar.Anchor", zeroProg);
+        cmd.set("#HonorRPToNextRank.Text", "");
 
         // Invite section (officers+)
         if (myRole != null && myRole.hasAtLeast(GuildRole.OFFICER)) {
@@ -425,7 +489,13 @@ public class FactionsContentRenderer {
             }
         }
 
-        cmd.set("#FooterText.Text", totalMembers + " member" + (totalMembers != 1 ? "s" : "") + " in guild"
+        int guildOnline = 0;
+        for (PlayerData m : members) {
+            if (onlineUuids.contains(m.getPlayerUuid())) {
+                guildOnline++;
+            }
+        }
+        cmd.set("#FooterText.Text", guildOnline + " online | " + totalMembers + " member" + (totalMembers != 1 ? "s" : "") + " in guild"
             + (totalPages > 1 ? " (showing " + (startIndex + 1) + "-" + endIndex + ")" : ""));
     }
 
@@ -435,8 +505,6 @@ public class FactionsContentRenderer {
         HC_FactionsPlugin plugin = getPlugin();
         PlayerData playerData = resolvePlayerData();
         Faction faction = resolveFaction();
-
-
 
         String playerFactionId = playerData != null ? playerData.getFactionId() : null;
         if (playerFactionId == null) {
@@ -495,7 +563,12 @@ public class FactionsContentRenderer {
             int maxMembers = plugin.getConfig().getGuildMaxMembers();
 
             cmd.set("#GuildRow" + rowIndex + ".Visible", true);
-            cmd.set("#GuildName" + rowIndex + ".Text", guildObj.getName());
+            String guildDisplayText = guildObj.getName();
+            String guildTag = guildObj.getTag();
+            if (guildTag != null && !guildTag.isEmpty()) {
+                guildDisplayText = "[" + guildTag + "] " + guildDisplayText;
+            }
+            cmd.set("#GuildName" + rowIndex + ".Text", guildDisplayText);
             cmd.set("#GuildMembers" + rowIndex + ".Text", memberCount + "/" + maxMembers);
             cmd.set("#GuildPower" + rowIndex + ".Text", guildObj.getPower() + " pwr");
 
@@ -644,6 +717,19 @@ public class FactionsContentRenderer {
 
         HC_FactionsPlugin plugin = getPlugin();
 
+        // Faction hero header
+        String factionColor = faction.getColorHex();
+        cmd.set("#HonorHeroSection.Visible", true);
+        cmd.set("#HonorRankNumber.TextSpans", Message.raw(faction.getShortName()).color(Color.WHITE));
+        cmd.set("#HonorRankTitle.TextSpans", Message.raw(faction.getDisplayName().toUpperCase()).color(Color.decode(factionColor)));
+        cmd.set("#HonorEmblemOuter.Background", factionColor);
+        cmd.set("#HonorPlayerName.Text", "Faction Overview");
+        cmd.set("#HonorFactionTag.TextSpans", Message.raw("").color(Color.WHITE));
+        com.hypixel.hytale.server.core.ui.Anchor zeroProg = new com.hypixel.hytale.server.core.ui.Anchor();
+        zeroProg.setWidth(com.hypixel.hytale.server.core.ui.Value.of(0));
+        zeroProg.setHeight(com.hypixel.hytale.server.core.ui.Value.of(20));
+        cmd.setObject("#HonorHeroProgressBar.Anchor", zeroProg);
+        cmd.set("#HonorRPToNextRank.Text", "");
 
         // Faction-wide stats
         String factionId = faction.getId();
@@ -652,11 +738,27 @@ public class FactionsContentRenderer {
 
         int totalPower = 0;
         int totalMembers = 0;
+        int totalClaims = 0;
+        Set<UUID> allFactionMemberUuids = new HashSet<>();
         if (guilds != null) {
             for (Guild g : guilds) {
                 totalPower += g.getPower();
                 List<PlayerData> members = plugin.getGuildManager().getGuildMembers(g.getId());
-                totalMembers += members != null ? members.size() : 0;
+                if (members != null) {
+                    totalMembers += members.size();
+                    for (PlayerData m : members) {
+                        allFactionMemberUuids.add(m.getPlayerUuid());
+                    }
+                }
+                totalClaims += plugin.getClaimManager().getClaimCount(g.getId());
+            }
+        }
+
+        // Count online faction members
+        int onlineCount = 0;
+        for (PlayerRef onlinePlayer : Universe.get().getPlayers()) {
+            if (allFactionMemberUuids.contains(onlinePlayer.getUuid())) {
+                onlineCount++;
             }
         }
 
@@ -665,8 +767,8 @@ public class FactionsContentRenderer {
         cmd.set("#PowerDesc.TextSpans", Message.raw("combined power").color(Color.decode("#96a9be")));
         cmd.set("#RankValue.Text", String.valueOf(guildCount));
         cmd.set("#RankDesc.TextSpans", Message.raw("total guilds").color(Color.decode("#96a9be")));
-        cmd.set("#MemberCountValue.Text", String.valueOf(totalMembers));
-        cmd.set("#MembersDesc.TextSpans", Message.raw("total players").color(Color.decode("#96a9be")));
+        cmd.set("#MemberCountValue.Text", onlineCount + "/" + totalMembers);
+        cmd.set("#MembersDesc.TextSpans", Message.raw("online / total").color(Color.decode("#96a9be")));
 
         // Top 3 guilds leaderboard (sorted by power)
         if (guilds != null && !guilds.isEmpty()) {
@@ -689,9 +791,10 @@ public class FactionsContentRenderer {
         cmd.set("#FactionQuickInfo.Visible", true);
         cmd.set("#QuickInfoText.Text",
             "Your faction competes against others for territory and resources.\n" +
+            "Total territory claimed: " + totalClaims + " chunks across " + guildCount + " guild" + (guildCount != 1 ? "s" : "") + ".\n" +
             "Support your guild and faction by participating in PvP combat!");
 
-        cmd.set("#FooterText.Text", "Fight for your faction's honor in PvP combat!");
+        cmd.set("#FooterText.Text", onlineCount + " online | " + totalMembers + " total players | " + totalPower + " power | " + totalClaims + " claims across " + guildCount + " guilds");
     }
 
     // ========== Action handling ==========
@@ -730,6 +833,7 @@ public class FactionsContentRenderer {
             case "set_tag" -> handleSetTag(plugin, guildTagInput);
             case "clear_tag" -> handleClearTag(plugin);
             case "invite_player" -> handleInvitePlayer(plugin, invitePlayerInput);
+            case "disband_guild" -> handleDisbandGuild(plugin);
             default -> false;
         };
     }
@@ -801,5 +905,13 @@ public class FactionsContentRenderer {
         if (targetData == null || targetData.isInGuild()) return false;
 
         return plugin.getGuildManager().invitePlayer(playerData.getGuildId(), targetData.getPlayerUuid());
+    }
+
+    private boolean handleDisbandGuild(HC_FactionsPlugin plugin) {
+        PlayerData playerData = plugin.getPlayerDataRepository().getPlayerData(playerRef.getUuid());
+        if (playerData == null || !playerData.isInGuild()) return false;
+        if (playerData.getGuildRole() != GuildRole.LEADER) return false;
+
+        return plugin.getGuildManager().disbandGuild(playerData.getGuildId());
     }
 }

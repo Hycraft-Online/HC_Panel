@@ -1,7 +1,7 @@
 package com.hcpanel.commands;
 
 import com.hcpanel.HC_PanelPlugin;
-import com.hcpanel.gui.MainMenuGui;
+import com.hcpanel.gui.UnifiedPanelGui;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -69,7 +69,10 @@ public class MenuCommand extends AbstractAsyncCommand {
             PlayerRef playerRef = freshStore.getComponent(freshRef, PlayerRef.getComponentType());
             if (playerRef == null) return;
 
-            MainMenuGui.openMenu(plugin, playerRef, freshStore);
+            Player freshPlayer = freshStore.getComponent(freshRef, Player.getComponentType());
+            if (freshPlayer == null) return;
+            freshPlayer.getPageManager().openCustomPage(freshRef, freshStore,
+                new UnifiedPanelGui(plugin, playerRef));
         });
 
         return CompletableFuture.completedFuture(null);

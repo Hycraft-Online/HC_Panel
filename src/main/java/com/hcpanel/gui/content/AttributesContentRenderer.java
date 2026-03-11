@@ -222,8 +222,24 @@ public class AttributesContentRenderer {
         cmd.set("#PoisonResValue.Text", String.valueOf(snapshot.getAttributeValue(Attribute.POISON_RESISTANCE)));
         cmd.set("#MagicResValue.Text", String.valueOf(snapshot.getAttributeValue(Attribute.MAGIC_RESISTANCE)));
 
-        // Footer
-        cmd.set("#FooterText.Text", "Use the Allocate tab to spend stat points from leveling.");
+        // Footer with build summary (reuse availablePoints from line 136)
+        if (availablePoints > 0) {
+            cmd.set("#FooterText.Text", availablePoints + " stat point" + (availablePoints > 1 ? "s" : "") + " available! Go to Allocate to spend them.");
+        } else {
+            // Show a brief build insight
+            int str = snapshot.getAttributeValue(Attribute.STRENGTH);
+            int agi = snapshot.getAttributeValue(Attribute.AGILITY);
+            int intl = snapshot.getAttributeValue(Attribute.INTELLECT);
+            String buildType;
+            if (intl >= str && intl >= agi) {
+                buildType = "Caster build (INT primary). Spell Power: " + snapshot.getSpellPower() + " SP.";
+            } else if (agi >= str) {
+                buildType = "Ranged/Crit build (AGI primary). Crit: " + String.format("%.1f%%", snapshot.getCritChance() * 100) + ".";
+            } else {
+                buildType = "Melee build (STR primary). Melee AP: " + snapshot.getMeleeAttackPower() + ".";
+            }
+            cmd.set("#FooterText.Text", buildType + " Use the Allocate tab to respec.");
+        }
     }
 
     private void renderAllocate(UICommandBuilder cmd, UIEventBuilder events, AttributeSnapshot snapshot) {
@@ -310,10 +326,10 @@ public class AttributesContentRenderer {
 
     private String getAttributeDescription(int index, int value) {
         return switch (index) {
-            case 0 -> "+" + (value * 2) + " AP (+" + value + " dmg)";  // STR: 2 AP, AP/2 bonus dmg
-            case 1 -> "+" + (value * 2) + " RAP, +" + String.format("%.1f", value / 20.0) + "% Crit";  // AGI: 2 RAP, 1% crit per 20
-            case 2 -> "+" + (value * 2) + " SP (+" + value + " dmg), +" + (value * 15) + " MP";  // INT: 2 SP, AP/2 bonus dmg
-            case 3 -> "+" + String.format("%.1f", value * 0.5) + " HP/t, +" + String.format("%.1f", value * 1.0) + " MP/t";  // SPI: 0.5 HP, 1.0 MP regen
+            case 0 -> "+" + (value * 2) + " Melee AP (+" + value + " dmg)";  // STR: 2 melee AP, AP/2 bonus dmg
+            case 1 -> "+" + (value * 2) + " Ranged AP, +" + String.format("%.1f", value / 20.0) + "% Crit";  // AGI: 2 RAP, 1% crit per 20
+            case 2 -> "+" + (value * 2) + " SP (+" + value + " dmg), +" + (value * 15) + " MP";  // INT: 2 SP, SP/2 bonus dmg
+            case 3 -> "+" + String.format("%.1f", value * 0.5) + " HP/s, +" + String.format("%.1f", value * 1.0) + " MP/s";  // SPI: 0.5 HP/s, 1.0 MP/s regen
             case 4 -> "+" + (value * 10) + " HP";  // VIT: 10 HP per point
             default -> "";
         };
