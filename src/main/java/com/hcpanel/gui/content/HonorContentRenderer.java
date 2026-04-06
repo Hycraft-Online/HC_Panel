@@ -35,8 +35,8 @@ public class HonorContentRenderer {
     private final PlayerRef playerRef;
 
     // Cached reflection references
-    private static boolean reflectionInitialized = false;
-    private static boolean honorAvailable = false;
+    private static volatile boolean reflectionInitialized = false;
+    private static volatile boolean honorAvailable = false;
     private static Method getInstanceMethod;
     private static Method getHonorManagerMethod;
     private static Method getHonorDataMethod;

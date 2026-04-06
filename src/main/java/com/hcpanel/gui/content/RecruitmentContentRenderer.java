@@ -29,8 +29,8 @@ public class RecruitmentContentRenderer {
     private final PlayerRef playerRef;
 
     // Cached reflection references
-    private static boolean reflectionInitialized = false;
-    private static boolean recruitmentAvailable = false;
+    private static volatile boolean reflectionInitialized = false;
+    private static volatile boolean recruitmentAvailable = false;
 
     // HC_RecruitmentPlugin
     private static Method getInstanceMethod;

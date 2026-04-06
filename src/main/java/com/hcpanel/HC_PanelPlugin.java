@@ -30,7 +30,7 @@ import java.util.logging.Level;
  */
 public class HC_PanelPlugin extends JavaPlugin {
 
-    private static HC_PanelPlugin instance;
+    private static volatile HC_PanelPlugin instance;
 
     private final List<ModuleContentProvider> availableModules = new ArrayList<>();
     private NewsConfig newsConfig;
